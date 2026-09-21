@@ -1,0 +1,42 @@
+name: Проверка lessons.json
+
+on:
+  push:
+    paths: [lessons.json]
+  pull_request:
+    paths: [lessons.json]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Проверить lessons.json
+        run: |
+          python3 - <<'PY'
+          import json, re, sys
+          VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
+          VIDEO_URL = re.compile(r"(?:youtu\.be/|youtube\.com/(?:watch\?(?:[^#]*&)?v=|embed/|shorts/|live/))([A-Za-z0-9_-]{11})")
+          def fail(msg):
+              print(f"::error file=lessons.json::{msg}")
+              sys.exit(1)
+          try:
+              data = json.load(open("lessons.json", encoding="utf-8-sig"))
+          except json.JSONDecodeError as e:
+              fail(f"Ошибка JSON: строка {e.lineno}, позиция {e.colno}: {e.msg}. Чаще всего не хватает запятой между блоками или лишняя запятая в конце.")
+          lessons = data.get("lessons") if isinstance(data, dict) else data
+          if not isinstance(lessons, list) or not lessons:
+              fail('Нужен список "lessons" хотя бы с одним уроком')
+          for n, item in enumerate(lessons, 1):
+              if not isinstance(item, dict):
+                  fail(f"Урок {n}: ожидался блок {{ ... }}")
+              if not str(item.get("title", "")).strip():
+                  fail(f'Урок {n}: не заполнено "title"')
+              video = str(item.get("video") or item.get("video_id") or "").strip()
+              if not (VIDEO_ID.match(video) or VIDEO_URL.search(video)):
+                  fail(f'Урок {n}: в "video" нужна ссылка или ID видео YouTube (11 символов)')
+              d = item.get("duration")
+              if d is not None and (isinstance(d, bool) or not isinstance(d, int) or not 0 < d < 1000):
+                  fail(f'Урок {n}: "duration" — число минут, например 24 (без кавычек)')
+          print(f"OK: уроков — {len(lessons)}")
+          PY

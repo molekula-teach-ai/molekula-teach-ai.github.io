@@ -79,7 +79,7 @@ async function sendMessage(forcedText) {
   const pending = addMessage('Үзіндіні талдап, түсініктеме дайындап жатырмын…');
   pending.classList.add('pending');
   try {
-    const data = await apiFetch('/api/ask_ai', {method:'POST', body:{question, timestamp:time, video_id:videoId, lesson_id:lessonId}});
+    const data = await apiFetch('/api/ask_ai', {method:'POST', body:{question, timestamp:time, lesson_id:lessonId}});
     pending.querySelector('p').innerHTML = renderMarkdown(data.answer);
 
     pending.classList.remove('pending');
@@ -113,7 +113,7 @@ async function openTest() {
   modal.classList.remove('hidden');
   $('#test-content').innerHTML = '<div class="loading-state">ЖИ сабақ материалдары бойынша 5 сұрақ дайындап жатыр…</div>';
   try {
-    const data = await apiFetch('/api/generate_test', {method:'POST', body:{video_id:videoId, lesson_id:lessonId}});
+    const data = await apiFetch('/api/generate_test', {method:'POST', body:{lesson_id:lessonId}});
     activeTest = data;
     renderTest(data.questions);
   } catch (error) {
@@ -240,8 +240,9 @@ function renderLesson(data) {
       $('#avatar').replaceChildren(img);
     }).catch(() => {});
   }
-  $('#progress-bar').style.width = `${Math.round((user.unlocked_lesson - 1) / lessons.length * 100)}%`;
-  $('#lesson-eyebrow').textContent = `Сабақ ${lessonId} · 24 минут`;
+  $('#course-name').textContent = data.course;
+  $('#progress-bar').style.width = `${Math.round(user.completed / lessons.length * 100)}%`;
+  $('#lesson-eyebrow').textContent = lesson.duration ? `Сабақ ${lessonId} · ${lesson.duration} минут` : `Сабақ ${lessonId}`;
   $('#lesson-title').textContent = lesson.title;
   const state = $('#lesson-state');
   state.classList.toggle('passed', data.progress.passed);
@@ -255,7 +256,7 @@ function renderLesson(data) {
     link.href = `lesson.html?lesson=${item.id}`;
     const number = document.createElement('span');
     number.className = 'lesson-number';
-    number.textContent = item.id < user.unlocked_lesson ? '✓' : item.id > user.unlocked_lesson ? '⌑' : String(item.id);
+    number.textContent = item.passed ? '✓' : item.id > user.unlocked_lesson ? '⌑' : String(item.id);
     const copy = document.createElement('span');
     const small = document.createElement('small'); small.textContent = `Сабақ ${item.id}`;
     const title = document.createElement('b'); title.textContent = item.title;
