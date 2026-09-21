@@ -160,13 +160,13 @@ async function submitTest(event) {
 function renderResult(result) {
   const content = $('#test-content'); content.replaceChildren();
   const score = document.createElement('div'); score.className = `result-score ${result.passed ? 'passed' : ''}`;
-  score.innerHTML = `<strong>${result.score}%</strong><b>${result.passed ? 'Сабақ өтілді' : 'Тағы да азырақ жаттығу керек'}</b><p>${result.passed ? 'Келесі сабақ ашылды.' : 'Белгіленген үзінділерді қайталап, қайта көріңіз.'}</p>`;
+  score.innerHTML = `<strong>${result.score}%</strong><b>${result.passed ? 'Сабақ өтілді' : 'Тағы біраз жаттығу керек'}</b><p>${result.passed ? 'Келесі сабақ ашылды.' : 'Белгіленген үзінділерді қайталап, тестті қайта тапсырып көріңіз.'}</p>`;
   content.append(score);
   result.details.filter(item => !item.correct).forEach(item => {
     const review = document.createElement('div'); review.className = 'review-item';
     const title = document.createElement('b'); title.textContent = `${item.id}-сұрақ: дұрыс жауап — ${item.correct_option}`;
     const explanation = document.createElement('p'); explanation.textContent = item.explanation;
-    const link = document.createElement('a'); link.href = '#'; link.textContent = `${formatTime(item.timestamp)}-тен қайталау →`;
+    const link = document.createElement('a'); link.href = '#'; link.textContent = `Қайталау: ${formatTime(item.timestamp)} →`;
     link.addEventListener('click', event => { event.preventDefault(); $('#test-modal').classList.add('hidden'); player?.seekTo?.(item.timestamp, true); player?.playVideo?.(); });
     review.append(title, explanation, link); content.append(review);
   });
