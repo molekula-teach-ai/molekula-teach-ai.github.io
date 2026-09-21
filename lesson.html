@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Molekula</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="app-page">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button id="toggle-sidebar" class="icon-button" title="Сабақтарды жасыру/көрсету" aria-label="Сабақтарды жасыру/көрсету" aria-pressed="false">☰</button>
+      <a class="brand" href="lesson.html"><span class="brand-mark">M</span><span>Molekula</span></a>
+    </div>
+    <div class="course-title"><span>Курс</span><b>Жүйелі ойлау</b></div>
+    <div class="profile-menu">
+      <div class="avatar" id="avatar"></div>
+      <div class="profile-copy"><b id="user-name"></b><span id="user-handle"></span></div>
+      <button id="logout" class="icon-button" title="Шығу" aria-label="Шығу">↗</button>
+    </div>
+  </header>
+
+  <main class="workspace" id="workspace">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-heading"><span class="eyebrow">Бағдарлама</span><b>Сіздің үлгеріміңіз</b></div>
+      <div class="progress-track"><span id="progress-bar" style="width: 0%"></span></div>
+      <nav class="lesson-list" id="lesson-list"></nav>
+      <div class="sidebar-note"><span>✦</span><p><b>Кеңес</b>Бейнені тоқтатып, белгілі бір үзінді туралы ЖИ-ден сұраңыз.</p></div>
+    </aside>
+
+    <section class="lesson-area">
+      <div class="lesson-head">
+        <div><span class="eyebrow" id="lesson-eyebrow"></span><h1 id="lesson-title"></h1></div>
+        <div class="lesson-state" id="lesson-state"></div>
+      </div>
+
+      <div class="learning-grid">
+        <section class="video-card">
+          <div class="video-frame"><div id="player"></div><div id="video-loader" class="video-loader"><span></span><p>Сабақ жүктеліп жатыр</p></div></div>
+          <div class="video-meta">
+            <div><b id="time-label">00:00</b><span>Ағымдағы үзінді</span></div>
+            <button id="pause-ask" class="button attention"><span>Ⅱ</span> Тоқтату және сұрау</button>
+          </div>
+        </section>
+
+        <section class="assistant-card">
+          <header class="assistant-head">
+            <div class="ai-avatar">✦</div><div><b>ЖИ-тәлімгер</b><span><i></i> Сабақ контексі қосылды</span></div>
+            <button id="clear-chat" class="icon-button" title="Чатты тазарту">↺</button>
+          </header>
+          <div id="chat-box" class="chat-box" aria-live="polite">
+            <div class="message assistant"><span class="message-label">Тәлімгер</span><p>Сіз сабақты көріп жатқанда мен қасыңызда боламын. Күрделі жерде бейнені тоқтатыңыз — мен оны тайм-кодты ескере отырып түсіндіремін.</p></div>
+            <button class="suggestion" data-question="Осы үзіндінің негізгі ойын қарапайым сөзбен түсіндір">Қарапайым сөзбен түсіндір <span>→</span></button>
+            <button class="suggestion" data-question="Осы үзіндіге практикалық мысал келтір">Мысал келтір <span>→</span></button>
+          </div>
+          <form id="chat-form" class="composer">
+            <textarea id="user-input" rows="1" maxlength="1200" placeholder="Сабақ бойынша сұрақ қойыңыз…"></textarea>
+            <div class="composer-foot"><span id="context-time">Контекст · 00:00</span><button class="send-button" aria-label="Жіберу">↑</button></div>
+          </form>
+        </section>
+      </div>
+
+      <section class="completion-card">
+        <div><span class="eyebrow">Білімді бекітіңіз</span><h2>Өзіңізді тексеруге дайынсыз ба?</h2><p>Сабақтың негізгі идеялары бойынша 5 сұрақ. Әрі қарай өту үшін 80% жинау керек.</p></div>
+        <button id="generate-test" class="button primary">Тестті бастау <span>→</span></button>
+      </section>
+    </section>
+  </main>
+
+  <div id="test-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="test-title">
+    <div class="modal-card">
+      <header class="modal-head"><div><span class="eyebrow">Білімді тексеру</span><h2 id="test-title">Сабақ бойынша тест</h2></div><button id="close-test" class="icon-button" aria-label="Жабу">×</button></header>
+      <div id="test-content" class="test-content"></div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+  <script src="js/player.js"></script>
+  <script src="https://www.youtube.com/iframe_api" async></script>
+</body>
+</html>
+

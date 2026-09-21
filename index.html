@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Кіру — Molekula</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-story" aria-label="Платформа туралы">
+      <a class="brand brand-light" href="#" aria-label="Molekula"><span class="brand-mark">M</span><span>Molekula</span></a>
+      <div class="story-copy">
+        <span class="eyebrow light">Жаңа буынның оқыту тәжірибесі</span>
+        <h1>Күрделіні түсінің.<br>Өз қарқыныңызда.</h1>
+        <p>Бейне, ЖИ-дің нақты түсіндірмелері және қысқа білім тексерулері — бір ыңғайлы кеңістікте.</p>
+      </div>
+      <div class="story-proof"><span class="proof-dot"></span><span>Сабақ контексі автоматты түрде сақталады</span></div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-card">
+        <div class="mobile-brand"><span class="brand-mark">M</span><b>Molekula</b></div>
+        <span class="eyebrow">Жеке кабинет</span>
+        <h2>Қош келдіңіз</h2>
+        <p class="muted">Кіріңіз немесе Telegram арқылы есептік жазбаны растаңыз.</p>
+
+        <div class="tabs" role="tablist">
+          <button class="tab active" type="button" data-tab="login">Кіру</button>
+          <button class="tab" type="button" data-tab="register">Тіркелу</button>
+        </div>
+
+        <form id="login-form" class="auth-form">
+          <label>Telegram username<input name="username" autocomplete="username" placeholder="@username" required></label>
+          <label>Құпия сөз<input name="password" type="password" autocomplete="current-password" placeholder="Кемінде 8 таңба" required></label>
+          <button class="button primary wide" type="submit">Кіру <span>→</span></button>
+        </form>
+
+        <form id="register-form" class="auth-form hidden">
+          <div class="telegram-step">
+            <span class="step-index">1</span>
+            <div><b>Telegram-ботты ашыңыз</b><p>Бот сіздің тіркелгіңізді көру үшін Start батырмасын басыңыз.</p></div>
+          </div>
+          <a class="button telegram wide" id="telegram-link" href="#" target="_blank" rel="noreferrer">Telegram-ботты ашу</a>
+          <label>Telegram username<input name="username" autocomplete="username" placeholder="@username" required></label>
+          <button id="request-code" class="button secondary wide" type="button">Telegram-ге код алу</button>
+          <div id="verify-fields" class="hidden">
+            <label>Растау коды<input name="code" inputmode="numeric" maxlength="6" placeholder="000000"></label>
+            <label>Құпия сөз ойлап табыңыз<input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Кемінде 8 таңба"></label>
+            <button class="button primary wide" type="submit">Тіркелгі жасау <span>→</span></button>
+          </div>
+        </form>
+        <div id="auth-status" class="status" role="status" aria-live="polite"></div>
+        <p class="fineprint">Жалғастыра отырып, сіз платформа ережелері мен құпиялылық саясатына келісесіз.</p>
+      </div>
+    </section>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    if (getToken()) location.replace('lesson.html');
+    document.querySelector('#telegram-link').href = window.APP_CONFIG.apiBase + '/telegram';
+    let regToken = null;
+    const statusBox = document.querySelector('#auth-status');
+    const setStatus = (text, kind='') => { statusBox.textContent = text; statusBox.className = `status ${kind}`; };
+    document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === tab));
+      document.querySelector('#login-form').classList.toggle('hidden', tab.dataset.tab !== 'login');
+      document.querySelector('#register-form').classList.toggle('hidden', tab.dataset.tab !== 'register');
+      setStatus('');
+    }));
+    const enter = (data) => { setToken(data.token); location.href = 'lesson.html'; };
+    document.querySelector('#login-form').addEventListener('submit', async e => {
+      e.preventDefault(); setStatus('Кіру жүріп жатыр…');
+      const f = new FormData(e.currentTarget);
+      try { enter(await apiFetch('/api/auth/login', {method:'POST', body:Object.fromEntries(f)})); }
+      catch (err) { setStatus(err.message, 'error'); }
+    });
+    document.querySelector('#request-code').addEventListener('click', async () => {
+      const username = document.querySelector('#register-form [name="username"]').value;
+      setStatus('Код жіберіліп жатыр…');
+      try {
+        const d = await apiFetch('/api/auth/request-code', {method:'POST', body:{username}});
+        regToken = d.reg_token;
+        document.querySelector('#verify-fields').classList.remove('hidden'); setStatus(d.message, 'success');
+      } catch (err) { setStatus(err.message, 'error'); }
+    });
+    document.querySelector('#register-form').addEventListener('submit', async e => {
+      e.preventDefault(); setStatus('Тіркелгі жасалып жатыр…');
+      const f = new FormData(e.currentTarget);
+      try { enter(await apiFetch('/api/auth/register', {method:'POST', body:{...Object.fromEntries(f), reg_token: regToken}})); }
+      catch (err) { setStatus(err.message, 'error'); }
+    });
+  </script>
+</body>
+</html>
