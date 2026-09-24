@@ -303,6 +303,35 @@ async function renderTools(id) {
     link.append(icon, copy);
     list.append(link);
   });
+  const arTool = tools.find(t => ['ar', '3d'].includes(t.type) && !/^https?:/i.test(t.url));
+  if (arTool) renderToolQr(list, arTool, id);
+}
+
+// QR-код AR-инструмента: учитель открывает урок на компьютере, ученик сканирует и смотрит модель в AR на телефоне.
+function loadQrLib() {
+  if (window.qrcode) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+    script.onload = resolve; script.onerror = reject;
+    document.head.append(script);
+  });
+}
+
+async function renderToolQr(list, tool, id) {
+  try { await loadQrLib(); } catch { return; }
+  const url = new URL(tool.url, location.href);
+  url.searchParams.set('lesson', id);
+  const qr = qrcode(0, 'M'); qr.addData(url.href); qr.make();
+  const box = document.createElement('div');
+  box.className = 'tool-qr';
+  box.innerHTML = qr.createSvgTag({cellSize: 3, margin: 0});
+  const text = document.createElement('span');
+  const title = document.createElement('b'); title.textContent = 'Телефонмен сканерле';
+  const note = document.createElement('small'); note.textContent = 'AR ашылады: камераға рұқсат бер де, модельді партаға қой';
+  text.append(title, note);
+  box.append(text);
+  list.append(box);
 }
 
 $('#logout')?.addEventListener('click', () => { clearToken(); location.replace('index.html'); });

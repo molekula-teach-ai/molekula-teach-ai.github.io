@@ -13,6 +13,10 @@
     .tool:hover{border-color:var(--blue);background:var(--blue-soft)}
     .tool-icon{flex:none;width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue);font-size:19px}
     .tool b{display:block}.tool small{display:block;color:var(--muted);line-height:1.35;margin-top:2px}
+    .tool-qr{display:flex;gap:12px;align-items:center;padding:10px 14px;border:1px dashed var(--line);border-radius:10px}
+    .tool-qr svg{flex:none;width:96px;height:96px}
+    .tool-qr b{display:block}.tool-qr small{display:block;color:var(--muted);line-height:1.35;margin-top:2px}
+    @media (max-width:760px){.tool-qr{display:none}}
   </style>
 </head>
 <body class="app-page">

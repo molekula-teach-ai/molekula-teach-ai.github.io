@@ -34,6 +34,10 @@ ul{margin:8px 0 0;padding-left:18px;line-height:1.55}
 .legend span:before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px;background:var(--c)}
 .q{font-size:14px;color:var(--muted)}
 .q b{color:var(--ink)}
+.qr-card{display:flex;gap:14px;align-items:center}
+.qr-card #qr{flex:none;width:110px;height:110px}.qr-card svg{width:110px;height:110px}
+.qr-card p{margin:0;font-size:13px;color:var(--muted)}.qr-card b{color:var(--ink)}
+@media (max-width:860px){.qr-card{display:none}}
 @media (max-width:860px){main{grid-template-columns:1fr;height:auto}.stage{height:62vh}}
 </style>
 </head>
@@ -55,8 +59,10 @@ ul{margin:8px 0 0;padding-left:18px;line-height:1.55}
       <ul id="pts"></ul></div>
     <div class="card"><div class="legend" id="legend"></div></div>
     <div class="card q" id="q"></div>
+    <div class="card qr-card"><div id="qr"></div><p><b>Телефонмен сканерле</b><br>Бет телефонда ашылады. «AR-да көру» бас, камераға рұқсат бер де, модельді партаға қой.</p></div>
   </aside>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
 const M={
  water:{f:'H₂O',n:'Су молекуласы',shape:'Иілген',angle:'≈104,5°',atoms:3,bonds:2,leg:['O','H'],pts:['Оттек — ортада, екі сутек — бір жақта','Екі жалғыз электрон жұбы пішінді иеді','AR-да бүйірінен қарап, бұрышты бағала'],q:'<b>Сұрақ:</b> су молекуласы неге түзу емес?'},
@@ -70,8 +76,9 @@ function show(k){const m=M[k];mv.src=`models/${k}.glb`;mv.iosSrc=`models/${k}.us
  for(const id of['f','n','shape','angle','atoms','bonds'])document.getElementById(id).textContent=m[id];
  document.getElementById('pts').innerHTML=m.pts.map(p=>`<li>${p}</li>`).join('');
  document.getElementById('legend').innerHTML=m.leg.map(e=>`<span style="--c:${C[e]}">${e} — ${NAME[e]}</span>`).join('');
- document.getElementById('q').innerHTML=m.q;tabs.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.k===k));history.replaceState(null,'','#'+k)}
+ document.getElementById('q').innerHTML=m.q;tabs.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.k===k));history.replaceState(null,'','#'+k);drawQr()}
 Object.entries(M).forEach(([k,m])=>{const b=document.createElement('button');b.className='tab';b.dataset.k=k;b.textContent=m.f;b.onclick=()=>show(k);tabs.append(b)});
+function drawQr(){const el=document.getElementById('qr');if(!window.qrcode||!el)return;const q=qrcode(0,'M');q.addData(location.href);q.make();el.innerHTML=q.createSvgTag({cellSize:3,margin:0});}
 show(location.hash.slice(1) in M?location.hash.slice(1):'water');
 </script>
 <script>(function(){const n=new URLSearchParams(location.search).get('lesson');if(n&&/^\d+$/.test(n))document.getElementById('mk-back').href='../lesson.html?lesson='+n;})();</script>
