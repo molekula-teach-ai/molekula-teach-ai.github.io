@@ -1,7 +1,68 @@
 {
   "course": "Жүйелі ойлау",
   "lessons": [
-    {"title": "Заттың агрегаттық күйлері. 7-сынып.", "video": "k7TpolKgRSM"},
-    {"title": "Практика: күрделі жүйелерді талдаймыз", "video": "BRaSlOkSQL4"}
+    {
+      "title": "Заттың агрегаттық күйлері. 7-сынып.",
+      "video": "k7TpolKgRSM"
+    },
+    {
+      "title": "Практика: күрделі жүйелерді талдаймыз",
+      "video": "BRaSlOkSQL4"
+    },
+    {
+      "title": "Темір неге таттанады?",
+      "video": "ВСТАВЬ_ССЫЛКУ_YOUTUBE",
+      "duration": 3
+    },
+    {
+      "title": "Алмаз бен графит: бір элемент, екі қасиет",
+      "video": "ВСТАВЬ_ССЫЛКУ_YOUTUBE",
+      "duration": 3
+    },
+    {
+      "title": "Молекулалардың кеңістіктегі пішіні",
+      "video": "ВСТАВЬ_ССЫЛКУ_YOUTUBE",
+      "duration": 3,
+      "tools": [
+        {
+          "type": "ar",
+          "title": "AR молекулалар",
+          "url": "vrar-molecules/#water",
+          "note": "H₂O, CO₂, CH₄ модельдерін айналдыр, телефонда партаға қой"
+        }
+      ]
+    },
+    {
+      "title": "Ерітінді ортасын индикатормен анықтау",
+      "video": "ВСТАВЬ_ССЫЛКУ_YOUTUBE",
+      "duration": 3,
+      "tools": [
+        {
+          "type": "lab",
+          "title": "Цифрлы зертхана",
+          "url": "digital-lab/",
+          "note": "Үлгі → индикатор → болжам → журнал → қорытынды"
+        }
+      ]
+    },
+    {
+      "title": "Ас тұзының иондық торын құрастыру",
+      "video": "ВСТАВЬ_ССЫЛКУ_YOUTUBE",
+      "duration": 3,
+      "tools": [
+        {
+          "type": "3d",
+          "title": "NaCl торын AR-да көру",
+          "url": "vrar-molecules/#nacl",
+          "note": "Blender-де құрастырылған 64 ионды модель"
+        },
+        {
+          "type": "file",
+          "title": "Blender жобасы (.blend)",
+          "url": "https://157-228-191-75.sslip.io/media/nacl_project.blend",
+          "note": "Blender 5.2-де ашып, өзің құрастырып көр"
+        }
+      ]
+    }
   ]
 }
