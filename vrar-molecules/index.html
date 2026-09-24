@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AR молекулалар — Digital Chemistry</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
+<style>
+:root{--bg:#071321;--panel:#101f2f;--line:#263b4e;--ink:#f3f7fc;--muted:#9bafc3;--cyan:#62dde4;--gold:#eac778;--mint:#98e5c4}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Helvetica Neue",sans-serif}
+body{min-height:100vh;background:radial-gradient(ellipse at 20% 40%,#0d2a3a 0,transparent 60%),var(--bg)}
+header{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--line)}
+.logo{font-weight:800;display:flex;gap:10px;align-items:center}
+.logo i{width:14px;height:14px;border-radius:50%;background:#ec9361;box-shadow:12px -6px 0 -3px var(--cyan)}
+header h1{font-size:18px;margin:0 0 0 10px;color:var(--muted);font-weight:700}
+main{display:grid;grid-template-columns:1fr 380px;gap:18px;padding:18px 22px;height:calc(100vh - 62px);min-height:560px}
+.stage{position:relative;background:linear-gradient(#0c1b28,#0a1622);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+model-viewer{width:100%;height:100%;--poster-color:transparent;background:transparent}
+.tabs{position:absolute;top:14px;left:14px;display:flex;gap:8px;z-index:2;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:#0c1b28cc;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:16px;cursor:pointer}
+.tab.on{background:var(--cyan);color:#062028;border-color:var(--cyan)}
+.arbtn{position:absolute;right:16px;bottom:16px;border:0;border-radius:999px;padding:14px 22px;background:var(--mint);color:#062018;font-weight:800;font-size:16px;cursor:pointer}
+.hint{position:absolute;left:16px;bottom:18px;color:var(--muted);font-size:13px}
+aside{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
+.card h2{margin:0 0 4px;font-size:34px}
+.card .sub{color:var(--muted);margin-bottom:14px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv div{background:#0c1b28;border:1px solid var(--line);border-radius:12px;padding:10px}
+.kv small{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+.kv b{font-size:20px;color:var(--gold)}
+ul{margin:8px 0 0;padding-left:18px;line-height:1.55}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.legend span:before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.q{font-size:14px;color:var(--muted)}
+.q b{color:var(--ink)}
+@media (max-width:860px){main{grid-template-columns:1fr;height:auto}.stage{height:62vh}}
+</style>
+</head>
+<body>
+<header><a class="logo" href="../digital-chemistry/" style="color:inherit;text-decoration:none"><i></i>DIGITAL CHEMISTRY</a><h1>VR/AR · Молекулалардың кеңістіктегі пішіні</h1></header>
+<main>
+  <section class="stage">
+    <div class="tabs" id="tabs"></div>
+    <model-viewer id="mv" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="24deg" shadow-intensity="0.6" exposure="1.05"
+      environment-image="neutral" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" touch-action="pan-y" interaction-prompt="none">
+      <button slot="ar-button" class="arbtn">AR-да көру — партаға қой</button>
+    </model-viewer>
+    <div class="hint">Айналдыр: тінтуір / саусақ · Масштаб: дөңгелек / екі саусақ</div>
+  </section>
+  <aside>
+    <div class="card"><h2 id="f"></h2><div class="sub" id="n"></div>
+      <div class="kv"><div><small>Пішіні</small><b id="shape"></b></div><div><small>Бұрыш</small><b id="angle"></b></div>
+      <div><small>Атомдар</small><b id="atoms"></b></div><div><small>Байланыстар</small><b id="bonds"></b></div></div>
+      <ul id="pts"></ul></div>
+    <div class="card"><div class="legend" id="legend"></div></div>
+    <div class="card q" id="q"></div>
+  </aside>
+</main>
+<script>
+const M={
+ water:{f:'H₂O',n:'Су молекуласы',shape:'Иілген',angle:'≈104,5°',atoms:3,bonds:2,leg:['O','H'],pts:['Оттек — ортада, екі сутек — бір жақта','Екі жалғыз электрон жұбы пішінді иеді','AR-да бүйірінен қарап, бұрышты бағала'],q:'<b>Сұрақ:</b> су молекуласы неге түзу емес?'},
+ co2:{f:'CO₂',n:'Көмірқышқыл газы',shape:'Сызықтық',angle:'180°',atoms:3,bonds:'2 қос',leg:['C','O'],pts:['Көміртек — ортада','Екі қос байланыс қарама-қарсы бағытта','Кез келген жақтан айналдырсаң да түзу'],q:'<b>Сұрақ:</b> CO₂ мен H₂O-ның пішіні неге әртүрлі?'},
+ ch4:{f:'CH₄',n:'Метан',shape:'Тетраэдр',angle:'≈109,5°',atoms:5,bonds:4,leg:['C','H'],pts:['Төрт сутек — тетраэдрдің төбелерінде','Сутектер бір жазықтықта жатпайды','Модельді айналдырып, 4 бағытты сана'],q:'<b>Сұрақ:</b> метан жазық шаршы ма, тетраэдр ме?'},
+ nacl:{f:'NaCl',n:'Ас тұзының иондық торы',shape:'Кубтық тор',angle:'90°',atoms:'64 ион',bonds:'6 көрші',leg:['Na','Cl'],pts:['Na⁺ және Cl⁻ кезектесіп орналасады','Ішкі ионның 6 қарама-қарсы көршісі бар','Модель Blender-де құрастырылды'],q:'<b>Сұрақ:</b> ішкі Na⁺ ионын қандай иондар қоршайды?'}
+};
+const C={H:'#e8f0f4',O:'#f16b69',C:'#5c6670',Na:'#8c73ff',Cl:'#40d49e'},NAME={H:'сутек',O:'оттек',C:'көміртек',Na:'Na⁺ ионы',Cl:'Cl⁻ ионы'};
+const mv=document.getElementById('mv'),tabs=document.getElementById('tabs');
+function show(k){const m=M[k];mv.src=`models/${k}.glb`;mv.iosSrc=`models/${k}.usdz`;mv.cameraOrbit=k==='nacl'?'30deg 65deg auto':'0deg 80deg auto';
+ for(const id of['f','n','shape','angle','atoms','bonds'])document.getElementById(id).textContent=m[id];
+ document.getElementById('pts').innerHTML=m.pts.map(p=>`<li>${p}</li>`).join('');
+ document.getElementById('legend').innerHTML=m.leg.map(e=>`<span style="--c:${C[e]}">${e} — ${NAME[e]}</span>`).join('');
+ document.getElementById('q').innerHTML=m.q;tabs.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.k===k));history.replaceState(null,'','#'+k)}
+Object.entries(M).forEach(([k,m])=>{const b=document.createElement('button');b.className='tab';b.dataset.k=k;b.textContent=m.f;b.onclick=()=>show(k);tabs.append(b)});
+show(location.hash.slice(1) in M?location.hash.slice(1):'water');
+</script>
+</body>
+</html>

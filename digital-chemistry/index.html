@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Digital Chemistry — Molekula</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.dc{max-width:1180px;margin:0 auto;padding:28px 24px 60px}
+.dc-top{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.dc-top .back{margin-left:auto}
+.dc-hero h1{font-size:34px;line-height:1.15;margin:6px 0 10px}
+.dc-hero p{max-width:760px;color:var(--muted);margin:0}
+.dir-nav{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 8px}
+.dir-nav a{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;color:var(--ink);text-decoration:none;font-weight:700;font-size:13px}
+.dir{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px;margin-top:22px;scroll-margin-top:16px}
+.dir-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.dir-head h2{margin:0;font-size:22px}
+.tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:4px 10px;background:var(--blue-soft);color:var(--blue)}
+.tag.o{background:var(--orange-soft);color:var(--orange)}.tag.g{background:#e8f5ee;color:var(--green)}.tag.v{background:#f0ecff;color:#6a4fd1}
+.req{color:var(--muted);font-size:13px;margin:6px 0 14px}
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px}
+.videos{display:grid;gap:14px}
+video{width:100%;aspect-ratio:16/9;border-radius:12px;background:#0b1622;display:block}
+.vcap{font-size:13px;color:var(--muted);margin-top:6px}
+.side ul{margin:0 0 14px;padding-left:18px;line-height:1.6}
+.side .button{margin:0 8px 8px 0}
+.qr{display:flex;gap:14px;align-items:center;margin-top:10px;padding:12px;border:1px dashed var(--line);border-radius:12px}
+.qr div{width:120px;height:120px;flex:none}.qr svg{width:120px;height:120px}
+.qr p{margin:0;font-size:13px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);margin-top:26px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}.dc-hero h1{font-size:27px}}
+</style>
+</head>
+<body>
+<main class="dc">
+  <div class="dc-top">
+    <a class="brand" href="../lesson.html"><span class="brand-mark">M</span><span>Molekula</span></a>
+    <a class="button secondary back" href="../lesson.html">← Сабақтарға оралу</a>
+  </div>
+  <section class="dc-hero">
+    <span class="eyebrow">3-кезең · DIGITAL CHEMISTRY</span>
+    <h1>Химия сабағындағы жасанды интеллект және цифрлық құралдар</h1>
+    <p>Бес бағыт бойынша дайындалған жұмыстар: ЖИ көмегімен жасалған бейнероликтер, AR молекулалар, интерактивті цифрлы зертхана және Blender-де құрастырылған 3D жоба. Digital teacher бағыты — осы Molekula платформасының өзі.</p>
+    <nav class="dir-nav">
+      <a href="#neural">1 · Нейросеть</a><a href="#vrar">2 · VR/AR</a><a href="#lab">3 · Цифрлы зертхана</a><a href="../lesson.html">4 · Digital teacher</a><a href="#d3">5 · 3D конструкциялау</a>
+    </nav>
+  </section>
+
+  <section class="dir" id="neural">
+    <div class="dir-head"><span class="tag o">1 · Нейросеть</span><h2>ЖИ бейнелерінен құралған бейнероликтер</h2></div>
+    <p class="req">Талап: бірнеше бейнені қосу арқылы химия сабағында қолданылатын бейнеролик, ұзақтығы — 3 минут.</p>
+    <div class="grid">
+      <div class="videos">
+        <div><video controls preload="none" data-film="01_neural_rust"></video><div class="vcap">Темір неге таттанады? · 3:00</div></div>
+        <div><video controls preload="none" data-film="02_neural_carbon"></video><div class="vcap">Алмаз бен графит: бір элемент, екі қасиет · 3:01</div></div>
+      </div>
+      <div class="side">
+        <ul>
+          <li>Иллюстрацияларды нейросеть (ЖИ генерациясы) жасады</li>
+          <li>Озвучка — нейрондық қазақ дауысы (Aigul Neural)</li>
+          <li>Әр роликте: болжам, түсіндіру, тексеру сұрағы, қорытынды</li>
+          <li>Қазақша субтитрлер қосылған</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="dir" id="vrar">
+    <div class="dir-head"><span class="tag">2 · VR/AR</span><h2>Молекулалардың кеңістіктегі пішіні</h2></div>
+    <p class="req">Талап: педагог өзі дайындаған 3D бейнедегі бейнеролик, ұзақтығы — 3 минут.</p>
+    <div class="grid">
+      <div class="videos"><div><video controls preload="none" data-film="03_vrar_molecules"></video><div class="vcap">H₂O, CO₂, CH₄ — Blender 3D модельдері және AR беті · 3:02</div></div></div>
+      <div class="side">
+        <ul>
+          <li>Модельдер Blender-де жасалды (GLB / USDZ)</li>
+          <li>Телефонда «AR-да көру» — молекула партаның үстінде тұрады</li>
+          <li>iPhone: Quick Look · Android: Scene Viewer</li>
+        </ul>
+        <a class="button primary" href="../vrar-molecules/">AR молекулаларды ашу →</a>
+        <div class="qr"><div id="qr-ar"></div><p><b>Телефонмен сканерле</b><br>AR беті ашылады. Камераға рұқсат бер де, модельді партаға қой.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dir" id="lab">
+    <div class="dir-head"><span class="tag g">3 · Цифрлы зертхана</span><h2>Ерітінді ортасын индикатормен анықтау</h2></div>
+    <p class="req">Талап: мектеп жүйесінде бар зертханалық жұмыстың электронды аналогын ұсыну.</p>
+    <div class="grid">
+      <div class="videos"><div><video controls preload="none" data-film="04_digital_lab"></video><div class="vcap">Цифрлы зертхананың жұмысы · 3:04</div></div></div>
+      <div class="side">
+        <ul>
+          <li>Үш үлгі, үш индикатор: лакмус, фенолфталеин, метилоранж</li>
+          <li>Алдымен болжам → бақылау → журнал → қорытынды</li>
+          <li>Қорытынды журналмен дәлелденбесе, жүйе ескертеді</li>
+          <li>Интернетсіз де жұмыс істейді</li>
+        </ul>
+        <a class="button primary" href="../digital-lab/">Зертхананы ашу →</a>
+        <div class="qr"><div id="qr-lab"></div><p><b>Оқушыларға сілтеме</b><br>Планшетте немесе телефонда ашуға болады.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dir" id="d3">
+    <div class="dir-head"><span class="tag v">5 · 3D конструкциялау</span><h2>Ас тұзының иондық торы (NaCl)</h2></div>
+    <p class="req">Талап: әртүрлі 3D конструкциялау бағдарламаларын қолдану арқылы 1 жоба ұсыну.</p>
+    <div class="grid">
+      <div class="videos"><div><video controls preload="none" data-film="05_3d_nacl"></video><div class="vcap">Blender-де NaCl торын құрастыру · 3:02</div></div></div>
+      <div class="side">
+        <ul>
+          <li>Бағдарлама: Blender 5.2</li>
+          <li>4 × 4 × 4 фрагмент: 32 Na⁺ + 32 Cl⁻</li>
+          <li>Қабаттап жинау анимациясы, ішкі ионның 6 көршісі</li>
+          <li>Модельді AR-да да қарауға болады (NaCl қойындысы)</li>
+        </ul>
+        <a class="button primary" id="blend-link" href="#">Blender жобасын жүктеу (.blend)</a>
+        <a class="button secondary" href="../vrar-molecules/#nacl">NaCl-ды AR-да көру</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">Видеолар мен Blender файлы Molekula серверінен жүктеледі. Барлық мазмұн — оқу модельдері; нақты зертханада қауіпсіздік ережелерін сақтаңыз.</p>
+</main>
+<script src="../js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+const MEDIA = window.APP_CONFIG.apiBase + '/media/';
+document.querySelectorAll('video[data-film]').forEach(v => {
+  const f = v.dataset.film;
+  v.poster = MEDIA + f + '_poster.jpg';
+  v.crossOrigin = 'anonymous';
+  v.innerHTML = `<source src="${MEDIA}${f}.mp4" type="video/mp4"><track kind="subtitles" srclang="kk" label="Қазақша" src="${MEDIA}${f}.vtt">`;
+});
+document.getElementById('blend-link').href = MEDIA + 'nacl_project.blend';
+function qr(id, path) {
+  const el = document.getElementById(id);
+  if (!window.qrcode || !el) return;
+  const q = qrcode(0, 'M'); q.addData(new URL(path, location.href).href); q.make();
+  el.innerHTML = q.createSvgTag({ cellSize: 4, margin: 0 });
+}
+qr('qr-ar', '../vrar-molecules/'); qr('qr-lab', '../digital-lab/');
+</script>
+</body>
+</html>

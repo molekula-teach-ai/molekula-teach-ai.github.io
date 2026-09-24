@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Цифрлы зертхана — ерітінді ортасы</title>
+<style>
+:root{--bg:#071321;--panel:#101f2f;--panel2:#0c1b28;--line:#263b4e;--ink:#f3f7fc;--muted:#9bafc3;--cyan:#62dde4;--mint:#98e5c4;--gold:#eac778;--red:#d5746f;--copper:#ec9361;--glass:#8fb1be}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Helvetica Neue",sans-serif}
+body{min-height:100vh;background:radial-gradient(ellipse at 10% 30%,#0d2a3a 0,transparent 55%),radial-gradient(ellipse at 95% 60%,#241a1a 0,transparent 50%),var(--bg)}
+button,select{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:18px;padding:14px 26px;border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px}
+.logo i{width:14px;height:14px;border-radius:50%;background:var(--copper);display:inline-block;box-shadow:12px -6px 0 -3px var(--cyan)}
+header h1{font-size:19px;margin:0 0 0 14px;font-weight:700;color:var(--muted)}
+.steps{margin-left:auto;display:flex;gap:6px}
+.step{font-size:13px;padding:7px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.step.on{border-color:var(--mint);color:var(--bg);background:var(--mint);font-weight:700}
+.step.done{border-color:#2f5a4d;color:var(--mint)}
+main{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;padding:18px 26px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.card h2{font-size:14px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.bench{position:relative;height:330px;background:linear-gradient(#0c1b28,#0a1824);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.bench:after{content:"";position:absolute;z-index:0;left:0;right:0;bottom:0;height:46px;background:#1a2a37;border-top:2px solid #2f4557}
+.tube{position:absolute;z-index:1;bottom:40px;width:92px;height:250px;cursor:pointer;transition:transform .35s}
+.tube svg{width:100%;height:100%;overflow:visible}
+.tube .liq{transition:fill 1.6s ease}
+.tube.sel{transform:translateY(-14px)}
+.tube .lab{position:absolute;left:0;right:0;bottom:-34px;text-align:center;font-weight:700;font-size:17px;z-index:2}
+.tube .ph{position:absolute;left:0;right:0;top:-26px;text-align:center;font-size:13px;color:var(--gold);display:none}
+.teacher .tube .ph{display:block}
+.tube .tag{position:absolute;left:0;right:0;top:40px;text-align:center;font-size:12px;color:var(--muted)}
+.dropper{position:absolute;width:34px;height:120px;left:0;top:-140px;transition:left .8s ease,top .8s ease;z-index:5;pointer-events:none}
+.drop{position:absolute;width:10px;height:14px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;z-index:4;opacity:0}
+.drop.fall{animation:fall .55s ease-in forwards}
+@keyframes fall{0%{opacity:1;transform:translateY(0)}100%{opacity:1;transform:translateY(120px)}}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ind{flex:1;min-width:150px;border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:10px 12px;cursor:pointer;text-align:left}
+.ind b{display:block;font-size:16px}
+.ind small{color:var(--muted);font-size:12px}
+.ind .bottle{float:right;width:22px;height:30px;border-radius:5px 5px 7px 7px;margin-left:8px;border:2px solid var(--glass)}
+.ind.sel{border-color:var(--gold);background:#1c2a2b}
+label{font-size:14px;color:var(--muted)}
+select{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 10px;min-width:170px}
+.btn{border:0;border-radius:999px;padding:12px 22px;font-weight:800;cursor:pointer;background:var(--mint);color:#082018}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.msg{min-height:26px;margin-top:10px;font-size:15px;color:var(--gold)}
+.msg.ok{color:var(--mint)}.msg.bad{color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{color:var(--muted);text-align:left;font-weight:600;padding:6px 6px;border-bottom:1px solid var(--line)}
+td{padding:7px 6px;border-bottom:1px solid #1a2e3e}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;border:1px solid var(--glass);vertical-align:-2px;margin-right:6px}
+.empty{color:var(--muted);font-style:italic}
+.concl{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+.concl div{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.concl b{display:block;margin-bottom:6px}
+.concl select{min-width:0;width:100%}
+.concl .res{font-size:13px;margin-top:6px;min-height:34px}
+.foot{padding:0 26px 16px;color:var(--muted);font-size:12px}
+.switch{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer}
+#cursor{position:fixed;width:26px;height:26px;left:-50px;top:-50px;z-index:99;pointer-events:none;transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1)}
+#cursor.click:after{content:"";position:absolute;left:-12px;top:-12px;width:28px;height:28px;border-radius:50%;border:3px solid var(--gold);animation:ping .45s ease-out}
+@keyframes ping{from{opacity:1;transform:scale(.3)}to{opacity:0;transform:scale(1.4)}}
+@media (max-width:900px){main{grid-template-columns:1fr}.steps{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="../digital-chemistry/" style="color:inherit;text-decoration:none"><i></i>DIGITAL CHEMISTRY</a>
+  <h1>Цифрлы зертхана · Ерітінді ортасын индикатормен анықтау</h1>
+  <div class="steps" id="steps">
+    <span class="step">1 · Үлгі</span><span class="step">2 · Индикатор</span><span class="step">3 · Болжам</span><span class="step">4 · Бақылау</span><span class="step">5 · Қорытынды</span>
+  </div>
+</header>
+<main>
+  <section>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <h2 style="margin:0">Зертхана үстелі — үлгіні таңда</h2>
+        <label class="switch"><input type="checkbox" id="teacher"> Мұғалім режимі (pH көрсету)</label>
+      </div>
+      <div class="bench" id="bench"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2>Индикатор таңда</h2>
+      <div class="row" id="inds"></div>
+      <div class="row" style="margin-top:14px">
+        <label for="pred">Болжамың: қандай түс болады?</label>
+        <select id="pred"><option value="">— таңда —</option></select>
+        <button class="btn" id="add" disabled>Индикатор қос</button>
+        <button class="btn ghost" id="fresh">Жаңа таза үлгі</button>
+      </div>
+      <div class="msg" id="msg">Алдымен үлгіні таңда.</div>
+    </div>
+  </section>
+  <section>
+    <div class="card">
+      <h2>Бақылау журналы</h2>
+      <table><thead><tr><th>№</th><th>Үлгі</th><th>Индикатор</th><th>Болжам</th><th>Бақылау</th><th></th></tr></thead>
+      <tbody id="log"><tr><td colspan="6" class="empty">Әзірге жазба жоқ</td></tr></tbody></table>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2>Қорытынды: ерітіндінің ортасы</h2>
+      <div class="concl" id="concl"></div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="check">Қорытындыны тексер</button></div>
+      <div class="msg" id="cmsg"></div>
+    </div>
+  </section>
+</main>
+<div class="foot">Оқу моделі: түстер индикатордың типтік өзгерісін көрсетеді (25 °C). Нақты зертханада қорғаныс көзілдірігін киіп, мұғалім нұсқауымен жұмыс істеңіз.</div>
+<svg id="cursor" viewBox="0 0 26 26"><path d="M3 2l18 10-8 2-3 8z" fill="#fff" stroke="#071321" stroke-width="1.6"/></svg>
+<script>
+'use strict';
+const SAMPLES=[{id:'A',ph:2,name:'тұз қышқылының сұйылтылған ерітіндісі'},{id:'B',ph:7,name:'дистилденген су'},{id:'C',ph:11,name:'натрий гидроксидінің сұйылтылған ерітіндісі'}];
+const IND={
+ litmus:{name:'Лакмус',hint:'қызыл / күлгін / көк',bottle:'#9b6ac9',color:ph=>ph<5?['#e34e68','қызыл']:ph<8?['#9b6ac9','күлгін']:['#3a7ce8','көк']},
+ phenol:{name:'Фенолфталеин',hint:'түссіз / таңқурай-қызғылт',bottle:'#e8f3f2',color:ph=>ph<8.2?[null,'түссіз']:['#e755b1','қызғылт']},
+ mo:{name:'Метилоранж',hint:'қызыл / қызғылт сары / сары',bottle:'#f0a13c',color:ph=>ph<3.1?['#e75050','қызыл']:ph<4.4?['#f08a3c','қызғылт сары']:['#f5cd44','сары']}
+};
+const COLORS=['түссіз','қызыл','күлгін','көк','қызғылт','сары','қызғылт сары'];
+const ENV={acid:'Қышқыл',neutral:'Бейтарап',base:'Сілтілі'};
+const $=s=>document.querySelector(s);
+const st={sample:null,ind:null,tubes:{A:null,B:null,C:null},log:[],busy:false};
+const bench=$('#bench');
+const W=()=>bench.clientWidth;
+function tubeSVG(id){return `<svg viewBox="0 0 92 250"><defs><linearGradient id="gl${id}" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset=".25" stop-color="#fff" stop-opacity=".04"/><stop offset="1" stop-color="#fff" stop-opacity=".1"/></linearGradient></defs>
+<path class="liq" d="M12 110 V204 a34 34 0 0 0 68 0 V110 Z" fill="#1b3342"/>
+<path d="M8 12 V204 a38 38 0 0 0 76 0 V12" fill="url(#gl${id})" stroke="#8fb1be" stroke-width="3"/>
+<rect x="0" y="4" width="92" height="12" rx="5" fill="#8fb1be"/>
+<line x1="12" y1="110" x2="80" y2="110" stroke="#9cc4d0" stroke-width="2"/>
+<line x1="22" y1="128" x2="22" y2="205" stroke="#d7eef3" stroke-width="3" opacity=".6"/></svg>`}
+SAMPLES.forEach((s,i)=>{const d=document.createElement('div');d.className='tube';d.dataset.id=s.id;d.innerHTML=tubeSVG(s.id)+`<div class="ph">pH ${s.ph}</div><div class="lab">Үлгі ${s.id}</div>`;d.onclick=()=>selectSample(s.id);bench.append(d)});
+const dropper=document.createElement('div');dropper.className='dropper';dropper.innerHTML='<svg viewBox="0 0 34 120"><rect x="5" y="0" width="24" height="44" rx="11" id="bulb" fill="#eac778"/><rect x="11" y="40" width="12" height="66" rx="4" fill="#c9dce3"/><path d="M11 104h12l-6 16z" fill="#c9dce3"/></svg>';bench.append(dropper);
+function layout(){const w=W();[...bench.querySelectorAll('.tube')].forEach((t,i)=>{t.style.left=(w*(i+1)/4-46)+'px'})}
+addEventListener('resize',layout);layout();
+Object.entries(IND).forEach(([k,v])=>{const b=document.createElement('button');b.className='ind';b.dataset.ind=k;b.innerHTML=`<span class="bottle" style="background:${v.bottle}"></span><b>${v.name}</b><small>${v.hint}</small>`;b.onclick=()=>selectInd(k);$('#inds').append(b)});
+COLORS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;$('#pred').append(o)});
+SAMPLES.forEach(s=>{const d=document.createElement('div');d.innerHTML=`<b>Үлгі ${s.id}</b><select data-concl="${s.id}"><option value="">— орта —</option>${Object.entries(ENV).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><div class="res" id="res${s.id}"></div>`;$('#concl').append(d)});
+$('#teacher').onchange=e=>document.body.classList.toggle('teacher',e.target.checked);
+$('#pred').onchange=update;$('#add').onclick=addIndicator;$('#fresh').onclick=fresh;$('#check').onclick=checkConcl;
+function msg(t,cls=''){const m=$('#msg');m.textContent=t;m.className='msg '+cls}
+function selectSample(id){if(st.busy)return;st.sample=id;bench.querySelectorAll('.tube').forEach(t=>t.classList.toggle('sel',t.dataset.id===id));
+ msg(st.tubes[id]?`Үлгі ${id}-ге ${IND[st.tubes[id]].name.toLowerCase()} қосылған. Басқа индикатор үшін «Жаңа таза үлгі» ал.`:`Үлгі ${id} таңдалды. Енді индикатор таңда.`,st.tubes[id]?'bad':'');update()}
+function selectInd(k){if(st.busy)return;st.ind=k;document.querySelectorAll('.ind').forEach(b=>b.classList.toggle('sel',b.dataset.ind===k));if(st.sample&&!st.tubes[st.sample])msg('Болжам жаса: түс қандай болады?');update()}
+function update(){const ready=st.sample&&st.ind&&$('#pred').value&&!st.tubes[st.sample]&&!st.busy;$('#add').disabled=!ready;
+ const stepEls=[...document.querySelectorAll('.step')];const stage=!st.sample?0:!st.ind?1:!$('#pred').value?2:st.log.length<1?3:4;stepEls.forEach((e,i)=>{e.className='step'+(i===stage?' on':i<stage?' done':'')})}
+function tubeEl(id){return bench.querySelector(`.tube[data-id="${id}"]`)}
+async function addIndicator(){const id=st.sample,k=st.ind,pred=$('#pred').value;if(!id||!k||!pred||st.tubes[id])return;st.busy=true;update();
+ const t=tubeEl(id),x=parseFloat(t.style.left)+29;bench.querySelector('#bulb').setAttribute('fill',IND[k].bottle);dropper.style.left=x+'px';dropper.style.top='-2px';await wait(900);
+ for(let i=0;i<3;i++){const d=document.createElement('div');d.className='drop';d.style.background=IND[k].bottle==='#e8f3f2'?'#cfe9ea':IND[k].bottle;d.style.left=(x+12)+'px';d.style.top='118px';bench.append(d);requestAnimationFrame(()=>d.classList.add('fall'));setTimeout(()=>d.remove(),700);await wait(380)}
+ const ph=SAMPLES.find(s=>s.id===id).ph,[col,name]=IND[k].color(ph);t.querySelector('.liq').setAttribute('fill',col||'#1f3a4a');st.tubes[id]=k;
+ await wait(700);dropper.style.top='-140px';
+ st.log.push({n:st.log.length+1,id,k,pred,obs:name,col});renderLog();
+ msg(pred===name?`Болжам расталды: ${name}.`:`Бақылау: ${name}. Болжам (${pred}) расталмады — себебін ойлан.`,pred===name?'ok':'bad');
+ $('#pred').value='';st.busy=false;update()}
+function fresh(){const id=st.sample;if(!id||st.busy)return;st.tubes[id]=null;tubeEl(id).querySelector('.liq').setAttribute('fill','#1b3342');msg(`Үлгі ${id}: жаңа таза сынама алынды.`);update()}
+function renderLog(){$('#log').innerHTML=st.log.map(r=>`<tr><td>${r.n}</td><td>${r.id}</td><td>${IND[r.k].name}</td><td>${r.pred}</td><td><span class="sw" style="background:${r.col||'transparent'}"></span>${r.obs}</td><td>${r.pred===r.obs?'✓':'✗'}</td></tr>`).join('')}
+function truth(ph){return ph<7?'acid':ph>7?'base':'neutral'}
+function evidence(id,env){const rows=st.log.filter(r=>r.id===id);if(!rows.length)return false;
+ // litmus or methyl orange + phenolphthalein can separate all three; phenolphthalein alone cannot separate acid from neutral
+ const set=new Set(rows.map(r=>r.k));if(set.has('litmus'))return true;if(env==='base'&&set.has('phenol'))return true;if(set.has('mo')&&set.has('phenol'))return true;if(env==='acid'&&set.has('mo'))return true;return false}
+function checkConcl(){let good=0;SAMPLES.forEach(s=>{const v=document.querySelector(`[data-concl="${s.id}"]`).value,r=$('#res'+s.id);
+ if(!v){r.textContent='Таңдау жоқ';r.style.color='var(--muted)';return}
+ if(v!==truth(s.ph)){r.textContent='✗ Бақылау нәтижесіне сәйкес емес';r.style.color='var(--red)';return}
+ if(!evidence(s.id,v)){r.textContent='Жауап дұрыс, бірақ дәлел жеткіліксіз: тағы индикатор қолдан';r.style.color='var(--gold)';return}
+ good++;r.textContent='✓ Дұрыс, журналмен дәлелденді';r.style.color='var(--mint)'});
+ const m=$('#cmsg');if(good===3){m.textContent='Тамаша! Үш үлгінің ортасы дұрыс анықталды.';m.className='msg ok';document.querySelectorAll('.step').forEach(e=>e.className='step done')}else{m.textContent=`${good} / 3 дәлелденген қорытынды.`;m.className='msg'}}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+// demo cursor (used for screen recording): window.demoCursor(x,y,click)
+window.demoCursor=(x,y,click)=>{const c=$('#cursor');c.style.left=x+'px';c.style.top=y+'px';if(click){c.classList.remove('click');void c.offsetWidth;c.classList.add('click')}};
+update();
+</script>
+</body>
+</html>
