@@ -55,5 +55,5 @@
 | `type` | Белгіше: `lab`, `ar`, `3d`, `file`, `link` (міндетті емес) |
 | `note` | Қысқа түсініктеме (міндетті емес) |
 
-Қазір бар құралдар: `digital-lab/` — цифрлы зертхана, `vrar-molecules/` — AR молекулалар (`#water`, `#co2`, `#ch4`, `#nacl`).
+Қазір бар құралдар: `digital-lab/` — цифрлы зертхана, `vrar-molecules/` — AR молекулалар (`#water`, `#co2`, `#ch4`, `#nacl`), `files/nacl_project.blend` — NaCl торының Blender жобасы.
 
