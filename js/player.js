@@ -266,6 +266,45 @@ function renderLesson(data) {
   });
 }
 
+// Инструменты урока (лаборатория, AR, 3D-модель…) берутся из поля "tools" урока в lessons.json.
+// Бэкенд это поле не использует, поэтому оно читается напрямую с GitHub Pages.
+const TOOL_ICONS = {lab: '⚗', ar: '◈', vr: '◈', '3d': '⬡', file: '⤓', link: '↗'};
+
+async function renderTools(id) {
+  const box = $('#lesson-tools');
+  if (!box) return;
+  let tools = [];
+  try {
+    const res = await fetch('lessons.json', {cache: 'no-cache'});
+    const catalog = await res.json();
+    const lessons = Array.isArray(catalog) ? catalog : catalog.lessons;
+    tools = (lessons?.[id - 1]?.tools || []).filter(t => t && t.title && t.url);
+  } catch { tools = []; }
+  box.classList.toggle('hidden', !tools.length);
+  const list = $('#tool-list');
+  list.replaceChildren();
+  tools.forEach(tool => {
+    const link = document.createElement('a');
+    link.className = 'tool';
+    if (/^https?:/i.test(tool.url)) {
+      link.href = tool.url; link.target = '_blank'; link.rel = 'noreferrer';
+    } else {
+      const url = new URL(tool.url, location.href);
+      url.searchParams.set('lesson', id);   // чтобы «Сабаққа оралу» вернула в этот урок
+      link.href = url.pathname + url.search + url.hash;
+    }
+    const icon = document.createElement('span');
+    icon.className = 'tool-icon';
+    icon.textContent = TOOL_ICONS[tool.type] || TOOL_ICONS.link;
+    const copy = document.createElement('span');
+    const title = document.createElement('b'); title.textContent = tool.title;
+    copy.append(title);
+    if (tool.note) { const note = document.createElement('small'); note.textContent = tool.note; copy.append(note); }
+    link.append(icon, copy);
+    list.append(link);
+  });
+}
+
 $('#logout')?.addEventListener('click', () => { clearToken(); location.replace('index.html'); });
 
 (async function boot() {
@@ -278,5 +317,6 @@ $('#logout')?.addEventListener('click', () => { clearToken(); location.replace('
     return;
   }
   renderLesson(lessonData);
+  renderTools(lessonId);
   initPlayer();
 })();

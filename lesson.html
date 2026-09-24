@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Molekula</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .tools-card{margin-top:18px;padding:22px 28px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}
+    .tools-card h2{margin:0;font-size:20px}
+    .tool-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:14px}
+    .tool{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line);border-radius:10px;color:var(--ink);text-decoration:none;background:#fff;transition:border-color .15s,background .15s}
+    .tool:hover{border-color:var(--blue);background:var(--blue-soft)}
+    .tool-icon{flex:none;width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue);font-size:19px}
+    .tool b{display:block}.tool small{display:block;color:var(--muted);line-height:1.35;margin-top:2px}
+  </style>
 </head>
 <body class="app-page">
   <header class="topbar">
@@ -14,7 +23,6 @@
     </div>
     <div class="course-title"><span>Курс</span><b id="course-name">Жүйелі ойлау</b></div>
     <div class="profile-menu">
-      <a class="button secondary" href="digital-chemistry/" style="min-height:38px;padding:0 12px;font-size:13px">✦ Digital Chemistry</a>
       <div class="avatar" id="avatar"></div>
       <div class="profile-copy"><b id="user-name"></b><span id="user-handle"></span></div>
       <button id="logout" class="icon-button" title="Шығу" aria-label="Шығу">↗</button>
@@ -60,6 +68,12 @@
           </form>
         </section>
       </div>
+
+      <section class="tools-card hidden" id="lesson-tools">
+        <span class="eyebrow">Сабақ құралдары</span>
+        <h2>Сабақпен бірге жұмыс істеңіз</h2>
+        <div class="tool-list" id="tool-list"></div>
+      </section>
 
       <section class="completion-card">
         <div><span class="eyebrow">Білімді бекітіңіз</span><h2>Өзіңізді тексеруге дайынсыз ба?</h2><p>Сабақтың негізгі идеялары бойынша 5 сұрақ. Әрі қарай өту үшін 80% жинау керек.</p></div>
