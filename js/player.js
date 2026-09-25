@@ -5,6 +5,7 @@ let lessonId = 1;
 let lessonData = null;
 let ytReady = false;
 let activeTest = null;
+let lastSavedTime = -1;
 const $ = (selector) => document.querySelector(selector);
 
 function formatTime(seconds) {
@@ -41,7 +42,9 @@ function updateTime() {
   const label = formatTime(time);
   $('#time-label').textContent = label;
   $('#context-time').textContent = `Контекст · ${label}`;
-  if (time > 0 && time % 10 === 0) {
+  // Раз в 10 секунд просмотра; на паузе не повторяем запрос каждую секунду.
+  if (time > 0 && time % 10 === 0 && time !== lastSavedTime) {
+    lastSavedTime = time;
     apiFetch('/api/progress', {method:'POST', body:{lesson_id:lessonId, timestamp:time}}).catch(() => {});
   }
 }
