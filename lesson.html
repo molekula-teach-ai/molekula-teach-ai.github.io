@@ -35,9 +35,9 @@
 
   <main class="workspace" id="workspace">
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-heading"><span class="eyebrow">Бағдарлама</span><b>Сіздің үлгеріміңіз</b></div>
+      <div class="sidebar-heading"><span class="eyebrow">Бағдарлама</span><b id="sidebar-title">Сіздің үлгеріміңіз</b></div>
       <div class="progress-track"><span id="progress-bar" style="width: 0%"></span></div>
-      <nav class="lesson-list" id="lesson-list"></nav>
+      <nav class="lesson-list" id="lesson-list" aria-label="Сабақтар"></nav>
       <div class="sidebar-note"><span>✦</span><p><b>Кеңес</b>Бейнені тоқтатып, белгілі бір үзінді туралы ЖИ-ден сұраңыз.</p></div>
     </aside>
 
@@ -79,7 +79,29 @@
         <div class="tool-list" id="tool-list"></div>
       </section>
 
-      <section class="completion-card">
+      <section id="lesson-materials" class="materials-card hidden" aria-labelledby="materials-title">
+        <header class="materials-heading">
+          <div><span class="eyebrow">Мұғалімге арналған</span><h2 id="materials-title">Сабақ материалдары</h2><p>ҚМЖ, слайдтар және сыныпта қолдануға дайын құжаттар.</p></div>
+          <span id="materials-count" class="material-count hidden"></span>
+        </header>
+        <div id="materials-status" class="materials-status" role="status" aria-live="polite"></div>
+        <button id="retry-materials" class="button secondary hidden" type="button">Қайта жүктеу</button>
+        <div id="materials-list" class="materials-list" aria-busy="false"></div>
+        <form id="material-upload" class="material-upload hidden">
+          <div class="upload-heading"><h3>Материал қосу</h3><p>Жүктелген файл осы сабақта барлық мұғалімдерге көрінеді.</p></div>
+          <fieldset id="upload-fields" class="upload-fields">
+            <legend class="visually-hidden">Материал деректері</legend>
+            <label class="upload-title">Материал атауы<input name="title" maxlength="200" placeholder="Мысалы, сабақтың қысқа мерзімді жоспары" required></label>
+            <label>Материал түрі<select name="kind"><option value="kmzh">ҚМЖ</option><option value="slides">Слайдтар</option><option value="worksheet">Жұмыс парағы</option><option value="other">Басқа материал</option></select></label>
+            <label class="upload-file">Файл<input name="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.txt,.png,.jpg,.jpeg,.webp" aria-describedby="upload-hint" required></label>
+            <p id="upload-hint" class="upload-hint">PDF, Word, PowerPoint, Excel, OpenDocument, TXT немесе сурет. Ең көбі 25 МБ.</p>
+            <button id="upload-material" class="button primary" type="submit">Материалды жүктеу <span aria-hidden="true">↑</span></button>
+          </fieldset>
+          <div id="upload-status" class="status" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <section class="completion-card hidden" id="student-completion">
         <div><span class="eyebrow">Білімді бекітіңіз</span><h2>Өзіңізді тексеруге дайынсыз ба?</h2><p>Сабақтың негізгі идеялары бойынша 5 сұрақ. Әрі қарай өту үшін 80% жинау керек.</p></div>
         <button id="generate-test" class="button primary">Тестті бастау <span>→</span></button>
       </section>
@@ -97,8 +119,8 @@
   <script src="js/api.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+  <script src="js/materials.js"></script>
   <script src="js/player.js"></script>
   <script src="https://www.youtube.com/iframe_api" async></script>
 </body>
 </html>
-

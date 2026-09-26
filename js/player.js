@@ -27,7 +27,7 @@ function initPlayer() {
         timer = setInterval(updateTime, 1000);
       },
       onStateChange: (event) => {
-        if (event.data === YT.PlayerState.ENDED) openTest();
+        if (event.data === YT.PlayerState.ENDED && lessonData?.user.role !== 'teacher' && lessonData?.user.role !== 'admin') openTest();
       }
     }
   });
@@ -42,8 +42,7 @@ function updateTime() {
   const label = formatTime(time);
   $('#time-label').textContent = label;
   $('#context-time').textContent = `Контекст · ${label}`;
-  // Раз в 10 секунд просмотра; на паузе не повторяем запрос каждую секунду.
-  if (time > 0 && time % 10 === 0 && time !== lastSavedTime) {
+  if (lessonData?.user.role !== 'teacher' && lessonData?.user.role !== 'admin' && time > 0 && time % 10 === 0 && time !== lastSavedTime) {
     lastSavedTime = time;
     apiFetch('/api/progress', {method:'POST', body:{lesson_id:lessonId, timestamp:time}}).catch(() => {});
   }
@@ -112,6 +111,7 @@ $('#clear-chat')?.addEventListener('click', () => {
 });
 
 async function openTest() {
+  if (!lessonData || lessonData.user.role === 'teacher' || lessonData.user.role === 'admin') return;
   const modal = $('#test-modal');
   modal.classList.remove('hidden');
   $('#test-content').innerHTML = '<div class="loading-state">ЖИ сабақ материалдары бойынша 5 сұрақ дайындап жатыр…</div>';
@@ -190,7 +190,7 @@ window.addEventListener('beforeunload', () => clearInterval(timer));
   if (!video || !assistant) return;
 
   function syncHeight() {
-    assistant.style.height = `${video.offsetHeight}px`;
+    assistant.style.height = window.matchMedia('(min-width: 1101px)').matches ? `${video.offsetHeight}px` : '';
   }
 
   syncHeight();
@@ -229,12 +229,14 @@ function renderMarkdown(text) {
 
 function renderLesson(data) {
   const {user, lesson, lessons} = data;
+  const isTeacher = user.role === 'teacher' || user.role === 'admin';
   lessonId = data.lesson_id;
   videoId = lesson.video_id;
   const name = user.display_name || user.username;
   document.title = `${lesson.title} — Molekula`;
   $('#user-name').textContent = name;
-  $('#user-handle').textContent = `@${user.username}`;
+  const roleLabel = user.role === 'admin' ? 'Әкімші' : isTeacher ? 'Мұғалім' : 'Оқушы';
+  $('#user-handle').textContent = `${roleLabel} · @${user.username}`;
   $('#avatar').textContent = name[0].toUpperCase();
   if (user.has_photo) {
     apiFetch('/api/profile-photo', {blob: true}).then(blob => {
@@ -244,22 +246,28 @@ function renderLesson(data) {
     }).catch(() => {});
   }
   $('#course-name').textContent = data.course;
-  $('#progress-bar').style.width = `${Math.round(user.completed / lessons.length * 100)}%`;
+  $('#sidebar-title').textContent = isTeacher ? 'Барлық сабақтар' : 'Сіздің үлгеріміңіз';
+  $('.progress-track').classList.toggle('hidden', isTeacher);
+  $('#student-completion').classList.toggle('hidden', isTeacher);
+  $('#progress-bar').style.width = `${lessons.length ? Math.round(user.completed / lessons.length * 100) : 0}%`;
   $('#lesson-eyebrow').textContent = lesson.duration ? `Сабақ ${lessonId} · ${lesson.duration} минут` : `Сабақ ${lessonId}`;
   $('#lesson-title').textContent = lesson.title;
   const state = $('#lesson-state');
-  state.classList.toggle('passed', data.progress.passed);
-  state.textContent = data.progress.passed ? '✓ Өтілді' : 'Жүріп жатыр';
+  state.classList.toggle('passed', !isTeacher && data.progress.passed);
+  state.textContent = isTeacher ? 'Барлық сабақтар ашық' : data.progress.passed ? '✓ Өтілді' : 'Жүріп жатыр';
 
   const list = $('#lesson-list');
   list.replaceChildren();
   lessons.forEach(item => {
+    const locked = !isTeacher && item.id > user.unlocked_lesson;
     const link = document.createElement('a');
-    link.className = 'lesson-item' + (item.id === lessonId ? ' active' : '') + (item.id > user.unlocked_lesson ? ' locked' : '');
-    link.href = `lesson.html?lesson=${item.id}`;
+    link.className = 'lesson-item' + (item.id === lessonId ? ' active' : '') + (locked ? ' locked' : '');
+    if (locked) link.setAttribute('aria-disabled', 'true');
+    else link.href = `lesson.html?lesson=${item.id}`;
+    if (item.id === lessonId) link.setAttribute('aria-current', 'page');
     const number = document.createElement('span');
     number.className = 'lesson-number';
-    number.textContent = item.passed ? '✓' : item.id > user.unlocked_lesson ? '⌑' : String(item.id);
+    number.textContent = !isTeacher && item.passed ? '✓' : locked ? '⌑' : String(item.id);
     const copy = document.createElement('span');
     const small = document.createElement('small'); small.textContent = `Сабақ ${item.id}`;
     const title = document.createElement('b'); title.textContent = item.title;
@@ -350,5 +358,6 @@ $('#logout')?.addEventListener('click', () => { clearToken(); location.replace('
   }
   renderLesson(lessonData);
   renderTools(lessonId);
+  LessonMaterials.load(lessonData.user, lessonId);
   initPlayer();
 })();
