@@ -60,6 +60,37 @@
       "title": "Зат массасының сақталу заңы",
       "video": "zkO-GYjZALA",
       "duration": 3
+    },
+    {
+      "title": "Химиялық реакцияның белгілері",
+      "video": "qyhTmJNpv_o",
+      "duration": 3,
+      "tools": [
+        {
+          "type": "lab",
+          "title": "Цифрлы зертхана",
+          "url": "digital-lab/",
+          "note": "Индикатордың түсі өзгереді — реакция белгісін бақыла"
+        }
+      ]
+    },
+    {
+      "title": "Қоспаларды бөлу тәсілдері",
+      "video": "jC_zjBevKLE",
+      "duration": 3
+    },
+    {
+      "title": "Металдардың белсенділік қатары",
+      "video": "94z4pgNmp_k",
+      "duration": 3,
+      "tools": [
+        {
+          "type": "3d",
+          "title": "3D/AR зертхана",
+          "url": "activity-series/#lab",
+          "note": "Металл + ерітінді → болжам → 3D тәжірибе → журнал; AR-да партаға қой"
+        }
+      ]
     }
   ]
 }
