@@ -494,6 +494,8 @@ button:disabled:hover {
     top: 72px;
     height: calc(100vh - 72px);
     padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     border-right: 1px solid var(--line);
     background: #fbfbf9;
@@ -525,7 +527,15 @@ button:disabled:hover {
 }
 .lesson-list {
     display: grid;
+    align-content: start;
     gap: 6px;
+    /* Список уроков прокручивается сам, заголовок и «Кеңес» остаются на месте. */
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin-right: -8px;
+    padding-right: 8px;
 }
 .lesson-item {
     display: flex;
@@ -578,10 +588,8 @@ button:disabled:hover {
     font-size: 13px;
 }
 .sidebar-note {
-    position: absolute;
-    right: 20px;
-    bottom: 24px;
-    left: 20px;
+    flex: none;
+    margin-top: 16px;
     display: flex;
     gap: 10px;
     padding: 14px;
@@ -1238,6 +1246,8 @@ button:disabled:hover {
     }
     .lesson-list {
         display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
     }
     .lesson-item {
         min-width: 200px;
