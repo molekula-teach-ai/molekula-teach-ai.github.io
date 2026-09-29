@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D/AR зертхана — Металдардың белсенділік қатары</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
+<style>
+:root{--bg:#f7f7f5;--panel:#fff;--panel2:#f7f7f5;--line:#e8e7e3;--ink:#20201e;--muted:#73716c;--cyan:#2378d4;--gold:#c86f2b;--mint:#3d9368;--red:#c0453e}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Helvetica Neue",sans-serif}
+body{min-height:100vh;background:var(--bg)}
+button{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--line);background:#fff}
+.mk-brand{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--ink);text-decoration:none;font-size:17px;white-space:nowrap}.mk-mark{width:32px;height:32px;border-radius:8px;background:#2378d4;color:#fff;display:grid;place-items:center;font-weight:800}
+.mk-back{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 14px;color:var(--ink);text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap}.mk-back:hover{background:#eaf3fb}
+header h1{font-size:18px;margin:0 0 0 10px;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{display:grid;grid-template-columns:1fr 400px;gap:18px;padding:18px 22px;height:calc(100vh - 62px);min-height:600px}
+.stage{position:relative;background:linear-gradient(#ffffff,#e6ecf2);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+#lab3d{position:absolute;inset:0}
+#lab3d canvas{display:block;width:100%;height:100%;touch-action:none}
+model-viewer{position:absolute;inset:0;width:100%;height:100%;--poster-color:transparent;background:transparent}
+.hidden{display:none!important}
+.tabs{position:absolute;top:14px;left:14px;right:14px;display:flex;gap:8px;z-index:3;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:#ffffffe6;color:var(--ink);border-radius:999px;padding:9px 15px;font-weight:800;font-size:15px;cursor:pointer}
+.tab.on{background:var(--cyan);color:#fff;border-color:var(--cyan)}
+.tab.ar:before{content:"AR ";font-size:11px;opacity:.7}
+.arbtn{position:absolute;right:16px;bottom:16px;border:0;border-radius:999px;padding:14px 22px;background:var(--cyan);color:#fff;font-weight:800;font-size:16px;cursor:pointer}
+.hint{position:absolute;left:16px;bottom:16px;color:var(--muted);font-size:13px;z-index:2;pointer-events:none}
+.status{position:absolute;top:64px;left:16px;z-index:2;display:flex;gap:8px;flex-wrap:wrap;pointer-events:none}
+.pill{background:#ffffffe6;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-weight:800;font-size:15px}
+.pill.warn{background:#fff1ee;border-color:#f3c4bc;color:var(--red)}
+.pill.hot{background:#fff4ea;border-color:#f1cfb0;color:var(--gold)}
+.hs{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 9px;font-size:13px;font-weight:800;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08);white-space:nowrap;pointer-events:none}
+.hs.h{color:var(--cyan)}.hs.ok{color:var(--mint)}.hs.no{color:var(--red)}.hs.arrow{color:var(--cyan);font-weight:700}
+aside{display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-right:2px}
+.card{box-shadow:0 1px 2px rgba(20,20,18,.04),0 14px 40px rgba(20,20,18,.06);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.card h3{margin:0 0 10px;font-size:13px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.series{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+.el{min-width:44px;border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:7px 4px 6px;font-weight:800;font-size:17px;cursor:pointer;text-align:center;position:relative}
+.el small{display:block;font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
+.el i{position:absolute;left:6px;right:6px;top:3px;height:3px;border-radius:2px;background:var(--c)}
+.el.on{border-color:var(--cyan);background:#eaf3fb;box-shadow:0 0 0 2px #2378d433}
+.el.hmark{cursor:default;background:#fff;border-style:dashed;color:var(--cyan)}
+.arrow{font-size:12px;color:var(--muted);margin-top:8px}
+.reagents{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rg{border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:8px 10px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-size:14px}
+.rg b{font-size:15px}
+.rg .sw{flex:none;width:16px;height:22px;border-radius:3px 3px 6px 6px;border:2px solid #9fb8c4;background:var(--c)}
+.rg.on{border-color:var(--cyan);background:#eaf3fb}
+.heat{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px;color:var(--muted);cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;border-radius:999px;padding:11px 18px;font-weight:800;cursor:pointer;background:var(--mint);color:#fff}
+.btn.big{width:100%;margin-top:10px;font-size:16px;padding:13px}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn.guess{flex:1}
+.btn.guess.on{outline:3px solid #2378d455;background:var(--cyan)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.q{font-size:15px;margin-bottom:8px}
+.eq{font-size:18px;font-weight:800;margin:4px 0 10px;line-height:1.45}
+.eq div+div{margin-top:4px}
+.res p{margin:6px 0;line-height:1.45;font-size:14px}
+.res .why{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.verdict{font-weight:800;font-size:15px}
+.verdict.ok{color:var(--mint)}.verdict.bad{color:var(--red)}
+.danger{color:var(--red);font-weight:700;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:var(--muted);text-align:left;font-weight:600;padding:5px 4px;border-bottom:1px solid var(--line)}
+td{padding:6px 4px;border-bottom:1px solid var(--line)}
+.empty{color:var(--muted);font-style:italic;font-size:13px}
+.score{margin-top:8px;font-size:13px;color:var(--muted)}
+.mission button{display:block;width:100%;text-align:left;margin-top:6px;border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:9px 11px;cursor:pointer;font-size:15px;font-weight:700}
+.mission button:hover{border-color:var(--cyan)}
+.info h2{margin:0 0 4px;font-size:26px}
+.info .sub{color:var(--muted);margin-bottom:8px}
+.info ul{margin:8px 0 0;padding-left:18px;line-height:1.55}
+.qr-card{display:flex;gap:14px;align-items:center}
+.qr-card #qr{flex:none;width:110px;height:110px}.qr-card svg{width:110px;height:110px}
+.qr-card p{margin:0;font-size:13px;color:var(--muted)}.qr-card b{color:var(--ink)}
+@media (max-width:980px){main{grid-template-columns:1fr;height:auto}.stage{height:64vh;min-height:420px}aside{overflow:visible}.qr-card{display:none}header h1{display:none}}
+@media (max-width:520px){main{padding:12px}.tab{padding:8px 11px;font-size:14px}.status{top:100px}}
+</style>
+</head>
+<body>
+<header><a class="mk-brand" href="../lesson.html"><span class="mk-mark">M</span>Molekula</a><h1>3D/AR зертхана · Металдардың белсенділік қатары</h1><a class="mk-back" id="mk-back" href="../lesson.html">← Сабаққа оралу</a></header>
+<main>
+  <section class="stage">
+    <div class="tabs" id="tabs"></div>
+    <div id="lab3d"></div>
+    <div class="status" id="status"></div>
+    <model-viewer id="mv" class="hidden" camera-controls autoplay shadow-intensity="0.7" exposure="1.05" environment-image="neutral"
+      ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" touch-action="pan-y" interaction-prompt="none">
+      <button slot="ar-button" class="arbtn">AR-да көру — партаға қой</button>
+    </model-viewer>
+    <div class="hint" id="hint">Айналдыр: тінтуір / саусақ · Масштаб: дөңгелек / екі саусақ</div>
+  </section>
+
+  <aside id="labAside">
+    <div class="card">
+      <h3>1. Металды таңда</h3>
+      <div class="series" id="series"></div>
+      <div class="arrow">← белсендірек · · · · · белсенділігі төмен →</div>
+    </div>
+    <div class="card">
+      <h3>2. Ерітіндіні таңда</h3>
+      <div class="reagents" id="reagents"></div>
+      <label class="heat hidden" id="heatRow"><input type="checkbox" id="heat"> Суды қыздыру (≈80 °C)</label>
+    </div>
+    <div class="card">
+      <h3>3. Болжам жаса</h3>
+      <div class="q" id="question"></div>
+      <div class="row">
+        <button class="btn ghost guess" data-g="1">Иә, жүреді</button>
+        <button class="btn ghost guess" data-g="0">Жоқ, жүрмейді</button>
+      </div>
+      <button class="btn big" id="run" disabled>▶ Тәжірибені бастау</button>
+    </div>
+    <div class="card res hidden" id="result"></div>
+    <div class="card">
+      <h3>Зертхана журналы</h3>
+      <div id="journal"><div class="empty">Әзірге тәжірибе жоқ.</div></div>
+    </div>
+    <div class="card mission">
+      <h3>Видеодағы тапсырма</h3>
+      <div class="q">Үш реакцияның қайсысы шынымен жүреді? Әрқайсысын тексер.</div>
+      <button data-m="Cu,feso4">A. Cu + FeSO₄</button>
+      <button data-m="Zn,cuso4">B. Zn + CuSO₄</button>
+      <button data-m="Ag,hcl">C. Ag + HCl</button>
+    </div>
+  </aside>
+
+  <aside id="arAside" class="hidden">
+    <div class="card info"><h2 id="arTitle"></h2><div class="sub" id="arSub"></div><ul id="arPts"></ul></div>
+    <div class="card q" id="arQ"></div>
+    <div class="card qr-card"><div id="qr"></div><p><b>Телефонмен сканерле</b><br>Бет телефонда ашылады. «AR-да көру» бас, камераға рұқсат бер де, модельді партаға қой.</p></div>
+  </aside>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+
+const $ = id => document.getElementById(id);
+
+// ------------------------------------------------------------ chemistry
+const SERIES = ['K','Na','Ca','Mg','Al','Zn','Fe','Pb','H','Cu','Ag','Au'];
+const NAME = {K:'калий',Na:'натрий',Ca:'кальций',Mg:'магний',Al:'алюминий',Zn:'мырыш',Fe:'темір',Pb:'қорғасын',Cu:'мыс',Ag:'күміс',Au:'алтын'};
+const VAL = {K:1,Na:1,Ca:2,Mg:2,Al:3,Zn:2,Fe:2,Pb:2,Cu:2,Ag:1,Au:3};
+const ALKALI = ['K','Na','Ca'];
+const COLOR = {K:'#c9c9cf',Na:'#d8d8d2',Ca:'#cfcfc2',Mg:'#d2d5da',Al:'#dcdfe3',Zn:'#9eaab8',Fe:'#6f7275',Pb:'#6b6f7c',Cu:'#d9774a',Ag:'#ececf0',Au:'#ffc34d'};
+const REAGENTS = {
+  water:{f:'H₂O',n:'Су',c:'#dcedf7'},
+  hcl:{f:'HCl',n:'Тұз қышқылы',c:'#e3f1f8'},
+  cuso4:{f:'CuSO₄',n:'Мыс сульфаты',c:'#2f86f0',m:'Cu',x:'SO4',q:2},
+  feso4:{f:'FeSO₄',n:'Темір(II) сульфаты',c:'#b9e2b0',m:'Fe',x:'SO4',q:2},
+  znso4:{f:'ZnSO₄',n:'Мырыш сульфаты',c:'#e6f0f4',m:'Zn',x:'SO4',q:2},
+  agno3:{f:'AgNO₃',n:'Күміс нитраты',c:'#eaf1f4',m:'Ag',x:'NO3',q:1}
+};
+const COAT = {Cu:{c:'#9a4a2a',d:'қызыл-қоңыр мыс'},Fe:{c:'#3d3d3f',d:'қара-сұр темір'},Zn:{c:'#8d949c',d:'сұр мырыш'},Ag:{c:'#eeeef2',d:'жылтыр күміс кристалдары — «күміс ағаш»'}};
+const PPT = {Cu:{f:'Cu(OH)2',c:'#3b8fe0',d:'көк'},Fe:{f:'Fe(OH)2',c:'#8fa58a',d:'сұр-жасыл'},Zn:{f:'Zn(OH)2',c:'#f4f4f4',d:'ақ'},Ag:{f:'Ag2O',c:'#6b4a33',d:'қоңыр'}};
+const idx = el => SERIES.indexOf(el);
+
+const gcd = (a,b) => b ? gcd(b, a % b) : a;
+const POLY = {SO4:1,NO3:1,OH:1};
+function saltF(m, v, x, q){
+  const g = gcd(v,q), nm = q/g, nx = v/g;
+  return m + (nm>1?nm:'') + (nx>1 ? (POLY[x] ? `(${x})${nx}` : x+nx) : x);
+}
+function parse(f){ // "Al2(SO4)3" -> {Al:2,S:3,O:12}
+  const st=[{}]; let i=0;
+  while(i<f.length){
+    const ch=f[i];
+    if(ch==='('){st.push({});i++;continue}
+    if(ch===')'){i++;let n='';while(/\d/.test(f[i]||''))n+=f[i++];const top=st.pop(),k=+n||1;for(const e in top)st.at(-1)[e]=(st.at(-1)[e]||0)+top[e]*k;continue}
+    let e=f[i++];while(/[a-z]/.test(f[i]||''))e+=f[i++];let n='';while(/\d/.test(f[i]||''))n+=f[i++];
+    st.at(-1)[e]=(st.at(-1)[e]||0)+(+n||1);
+  }
+  return st[0];
+}
+const SUB = s => s.replace(/\d/g, d => '₀₁₂₃₄₅₆₇₈₉'[d]);
+function balance(L, R){ // brute-force smallest integer coefficients
+  const sp=[...L,...R].map(s=>parse(s.f)), n=sp.length, els=[...new Set(sp.flatMap(o=>Object.keys(o)))];
+  const k=Array(n).fill(1);
+  for(let t=0;t<9**n;t++){
+    let r=t;for(let i=0;i<n;i++){k[i]=r%9+1;r=Math.floor(r/9)}
+    if(els.every(e=>sp.reduce((s,o,i)=>s+(o[e]||0)*k[i]*(i<L.length?1:-1),0)===0)){
+      const side=(arr,o)=>arr.map((s,i)=>(k[i+o]>1?k[i+o]:'')+SUB(s.f)+(s.mark||'')).join(' + ');
+      return side(L,0)+' → '+side(R,L.length);
+    }
+  }
+  return '';
+}
+const hydroxide = m => saltF(m, VAL[m], 'OH', 1);
+
+function experiment(metal, rg, hot){
+  const R = REAGENTS[rg], i = idx(metal), E = {metal, rg, hot, reacts:false, kind:'none', rate:0, eqs:[], liquid:R.c, danger:false, shrink:0};
+  const nm = NAME[metal];
+  if (rg === 'water'){
+    if (ALKALI.includes(metal) || (metal==='Mg' && hot)){
+      Object.assign(E,{reacts:true,kind:'water',rate:{K:90,Na:65,Ca:32,Mg:10}[metal],shrink:metal==='Mg'?.35:1,
+        liquid:metal==='Mg'?'#f7b8d3':metal==='Ca'?'#f07fb0':'#f25a9c'});
+      E.eqs=[balance([{f:metal},{f:'H2O'}],[{f:hydroxide(metal)},{f:'H2',mark:'↑'}])+(metal==='Mg'?' (t°)':'')];
+      E.obs = metal==='Ca' ? 'Кальций суға батып, біркелкі көпіршиді, ерітінді лайланады (Ca(OH)₂ аз ериді). Фенолфталеин таңқурай түске боялды.'
+        : metal==='Mg' ? 'Ыстық суда магний бетінен сутек көпіршіктері бөлінеді, фенолфталеин әлсіз таңқурай түске боялады.'
+        : `${cap(nm)} су бетінде жүгіріп, балқып, шар пішініне келеді, сутек бөлінеді${metal==='K'?' және күлгін жалынмен тұтанады':''}. Фенолфталеин ерітіндіні таңқурай түске бояды — сілті түзілді.`;
+      E.why = metal==='Mg' ? 'Магний суық сумен өте баяу, ыстық сумен байқалатындай әрекеттеседі.' : 'Ең белсенді металдар (K, Na, Ca) суық сумен әрекеттесіп, сілті мен сутек түзеді.';
+    } else {
+      E.obs = metal==='Mg' ? 'Суық суда өзгеріс байқалмайды — реакция өте баяу. «Суды қыздыру» белгісін қойып, қайта көр.' : 'Өзгеріс жоқ: көпіршік те, түс өзгерісі де жоқ.';
+      E.why = metal==='Mg' ? 'Магний тек ыстық сумен әрекеттеседі.' : `${cap(nm)} — K, Na, Ca-дан оң жақта, қалыпты жағдайда сумен әрекеттеспейді${metal==='Al'?' (бетін жұқа оксид қабыршағы қорғайды)':''}.`;
+    }
+    return E;
+  }
+  if (rg === 'hcl'){
+    if (i < idx('H')){
+      const rate={K:150,Na:120,Ca:85,Mg:60,Al:26,Zn:22,Fe:8,Pb:3}[metal];
+      Object.assign(E,{reacts:true,kind:'acid',rate,danger:ALKALI.includes(metal),shrink:{K:1,Na:1,Ca:1,Mg:.75,Al:.45,Zn:.4,Fe:.15,Pb:.05}[metal],
+        liquid:metal==='Fe'?'#cfe9c4':R.c});
+      E.eqs=[balance([{f:metal},{f:'HCl'}],[{f:saltF(metal,VAL[metal],'Cl',1),mark:metal==='Pb'?'↓':''},{f:'H2',mark:'↑'}])];
+      const how = rate>=100?'жарылыс тәрізді, өте қарқынды':rate>=50?'өте қарқынды':rate>=20?'біркелкі, орташа жылдамдықпен':rate>=5?'баяу':'әрең байқалады';
+      E.obs = `${cap(nm)} бетінен сутек (H₂) көпіршіктері ${how} бөлінеді.` + (metal==='Pb'?' Кейін PbCl₂ қабыршағы металды жауып, реакция тоқтайды.':'') + (metal==='Fe'?' Ерітінді ақшыл жасыл түске боялады (FeCl₂).':'');
+      E.why = `1-ереже: ${metal} сутекке (H) дейін тұр → қышқылдан сутекті ығыстырады. Қатарда солға қарай неғұрлым алыс болса, көпіршік соғұрлым жылдам.`;
+    } else {
+      E.obs = 'Көпіршік жоқ — металл өзгеріссіз қалды.';
+      E.why = `1-ереже: ${metal} сутектен (H) кейін тұр → қышқылдан сутекті ығыстыра алмайды.`;
+    }
+    return E;
+  }
+  // salt solution
+  const B = R.m;
+  if (ALKALI.includes(metal)){
+    const p = PPT[B];
+    Object.assign(E,{reacts:true,kind:'alkali',rate:{K:90,Na:65,Ca:32}[metal],danger:true,shrink:1,ppt:p.c,liquid:mix(R.c,'#eef4f6',.75)});
+    const oh = hydroxide(metal);
+    E.eqs=[balance([{f:metal},{f:'H2O'}],[{f:oh},{f:'H2',mark:'↑'}]),
+      B==='Ag' ? balance([{f:oh},{f:'AgNO3'}],[{f:'Ag2O',mark:'↓'},{f:saltF(metal,VAL[metal],'NO3',1)},{f:'H2O'}])
+               : balance([{f:oh},{f:R.f.replace(/[₀-₉]/g,c=>'₀₁₂₃₄₅₆₇₈₉'.indexOf(c))}],[{f:p.f,mark:'↓'},{f:saltF(metal,VAL[metal],R.x,R.q)}])];
+    E.obs = `${cap(nm)} алдымен сумен әрекеттеседі: сутек бөлінеді, түзілген сілті тұзбен ${p.d} тұнба береді. ${B} ығыстырылмайды!`;
+    E.why = 'Ерекше жағдай: K, Na, Ca тұз ерітіндісінде металды ығыстырмайды — олар алдымен сумен әрекеттеседі.';
+  } else if (metal !== B && i < idx(B)){
+    const co = COAT[B];
+    Object.assign(E,{reacts:true,kind:'disp',coat:co.c,coatEl:B,shrink:.15,
+      liquid: B==='Cu' ? (metal==='Fe'?'#9ccfbc':metal==='Pb'?'#78b2ee':'#d5eaf3') : B==='Fe' ? '#e8f1f4' : B==='Ag' ? (metal==='Cu'?'#7fbaf2':metal==='Fe'?'#d5ebcb':R.c) : R.c});
+    E.eqs=[balance([{f:metal},{f:R.f.replace(/[₀-₉]/g,c=>'₀₁₂₃₄₅₆₇₈₉'.indexOf(c))}],[{f:saltF(metal,VAL[metal],R.x,R.q),mark:metal==='Pb'&&R.x==='SO4'?'↓':''},{f:B}])];
+    const col = B==='Cu' ? 'көк түсі әлсірейді' : B==='Fe' ? 'ақшыл жасыл түсін жоғалтады' : B==='Ag' && metal==='Cu' ? 'көгілдір түске боялады (Cu²⁺ иондары)' : 'түссіз күйде қалады';
+    E.obs = `${cap(nm)} бетінде ${co.d} қабаты түзіледі, ерітінді ${col}.`;
+    E.why = `2-ереже: ${metal} қатарда ${B}-дан сол жақта тұр → ${B}-ды оның тұзының ерітіндісінен ығыстырады.`;
+  } else if (metal === B){
+    E.obs = 'Өзгеріс жоқ.'; E.why = `${cap(nm)} өз тұзының ерітіндісінде тұр — ығыстыратын басқа металл жоқ.`;
+  } else {
+    E.obs = 'Өзгеріс жоқ: металдың беті де, ерітіндінің түсі де өзгермеді.';
+    E.why = `2-ереже: ${metal} қатарда ${B}-дан оң жақта тұр → белсенділігі төмен, ${B}-ды ығыстыра алмайды.`;
+  }
+  return E;
+}
+function cap(s){return s[0].toUpperCase()+s.slice(1)}
+function mix(a,b,t){return '#'+new THREE.Color(a).lerp(new THREE.Color(b),t).getHexString()}
+
+// ------------------------------------------------------------ 3D scene
+const box3d = $('lab3d');
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true;
+box3d.append(renderer.domElement);
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+const camera = new THREE.PerspectiveCamera(38, 1, .1, 200);
+camera.position.set(7, 10, 17);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 5, 0); controls.enableDamping = true; controls.enablePan = false;
+controls.minDistance = 7; controls.maxDistance = 32; controls.maxPolarAngle = Math.PI * .52;
+scene.add(new THREE.HemisphereLight(0xffffff, 0xc9d3dc, .6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(6, 16, 9); sun.castShadow = true; sun.shadow.mapSize.set(1024,1024);
+Object.assign(sun.shadow.camera,{left:-10,right:10,top:10,bottom:-10});
+scene.add(sun);
+
+const std = (c, o={}) => new THREE.MeshStandardMaterial({color:c, roughness:.55, ...o});
+const table = new THREE.Mesh(new THREE.BoxGeometry(34, 1, 18), std('#d9c3a5', {roughness:.8}));
+table.position.y = -.5; table.receiveShadow = true; scene.add(table);
+
+// rack
+const wood = std('#a4764f', {roughness:.7});
+const rack = new THREE.Group(); scene.add(rack);
+[[0,.15,0,7,.3,2.6],[-3.35,3.1,0,.3,6.2,2.4],[3.35,3.1,0,.3,6.2,2.4]].forEach(([x,y,z,w,h,d])=>{
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),wood);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;rack.add(m)});
+{ // top board with a hole for the tube
+  const sh=new THREE.Shape();sh.moveTo(-3.5,-1.2);sh.lineTo(3.5,-1.2);sh.lineTo(3.5,1.2);sh.lineTo(-3.5,1.2);sh.closePath();
+  const h=new THREE.Path();h.absarc(0,0,1.02,0,Math.PI*2,true);sh.holes.push(h);
+  const m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:.3,bevelEnabled:false,curveSegments:40}),wood);
+  m.rotation.x=-Math.PI/2;m.position.y=5.95;m.castShadow=m.receiveShadow=true;rack.add(m);
+}
+
+// test tube (lathe profile with round bottom)
+function tubeProfile(r, h, closeTop){
+  const pts=[];
+  for(let k=0;k<=12;k++){const a=-Math.PI/2+k/12*Math.PI/2;pts.push(new THREE.Vector2(Math.max(.001,r*Math.cos(a)), r+r*Math.sin(a)))}
+  pts.push(new THREE.Vector2(r,h)); if(closeTop)pts.push(new THREE.Vector2(.001,h));
+  return new THREE.LatheGeometry(pts, 48);
+}
+const TR = .9, TH = 10.2, LR = .84, LEVEL = 4.6;
+const tube = new THREE.Group(); tube.position.y = .32; scene.add(tube);
+const glass = new THREE.Mesh(tubeProfile(TR, TH), new THREE.MeshPhysicalMaterial({color:'#ffffff',transparent:true,opacity:.22,roughness:.04,metalness:0,side:THREE.DoubleSide,depthWrite:false,clearcoat:1}));
+glass.renderOrder = 3; tube.add(glass);
+const rim = new THREE.Mesh(new THREE.TorusGeometry(TR,.06,10,48), glass.material); rim.rotation.x=Math.PI/2; rim.position.y=TH; tube.add(rim);
+const liqMat = new THREE.MeshStandardMaterial({color:'#dcedf7',transparent:true,opacity:.55,roughness:.15,depthWrite:false,side:THREE.DoubleSide});
+const liquid = new THREE.Mesh(tubeProfile(LR, LEVEL, true), liqMat); liquid.renderOrder = 2; tube.add(liquid);
+
+// reagent bottle with a label
+const bottle = new THREE.Group(); bottle.position.set(-6.2, 0, -1.2); scene.add(bottle);
+const bMat = new THREE.MeshPhysicalMaterial({color:'#bcd4df',transparent:true,opacity:.35,roughness:.05,depthWrite:false});
+const bBody = new THREE.Mesh(new THREE.CylinderGeometry(1.4,1.4,3.6,40), bMat); bBody.position.y=1.8; bottle.add(bBody);
+const bNeck = new THREE.Mesh(new THREE.CylinderGeometry(.5,1.4,1,40), bMat); bNeck.position.y=4.1; bottle.add(bNeck);
+const bCap = new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,.7,30), std('#3a3f45')); bCap.position.y=4.9; bottle.add(bCap);
+const bLiq = new THREE.Mesh(new THREE.CylinderGeometry(1.3,1.3,2.4,40), new THREE.MeshStandardMaterial({transparent:true,opacity:.6,depthWrite:false})); bLiq.position.y=1.3; bottle.add(bLiq);
+const labelCanvas = document.createElement('canvas'); labelCanvas.width=512; labelCanvas.height=256;
+const labelTex = new THREE.CanvasTexture(labelCanvas); labelTex.colorSpace = THREE.SRGBColorSpace;
+const label = new THREE.Mesh(new THREE.CylinderGeometry(1.42,1.42,1.5,40,1,true,-Math.PI*.35,Math.PI*.7), new THREE.MeshStandardMaterial({map:labelTex,roughness:.8}));
+label.position.y=2.1; label.rotation.y = Math.PI; bottle.add(label);
+function drawLabel(R){
+  const g=labelCanvas.getContext('2d');g.fillStyle='#fbfaf6';g.fillRect(0,0,512,256);
+  g.fillStyle='#2378d4';g.fillRect(0,0,512,18);g.fillStyle='#20201e';g.textAlign='center';
+  g.font='bold 104px Arial';g.fillText(R.f,256,140);g.font='34px Arial';g.fillStyle='#73716c';g.fillText(R.n,256,205);labelTex.needsUpdate=true;
+}
+
+// metal samples
+function metalMat(el){return new THREE.MeshStandardMaterial({color:COLOR[el],metalness:ALKALI.includes(el)?.55:.9,roughness:ALKALI.includes(el)?.35:.28})}
+function makeMetal(el){
+  const g = new THREE.Group(), mat = metalMat(el), add=(geo,x=0,y=0,z=0,rz=0,rx=0)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.rotation.set(rx,0,rz);m.castShadow=true;g.add(m);return m};
+  g.userData = {mat, h:.5, spread:.35};
+  if (el==='K'||el==='Na'){ add(new THREE.BoxGeometry(.62,.42,.5)); g.userData.h=.2; }
+  else if (el==='Ca'){ [[-.2,0,0],[.22,.05,.12],[0,.02,-.25]].forEach(([x,y,z])=>add(new THREE.DodecahedronGeometry(.24),x,y,z,x,z)); }
+  else if (el==='Zn'){ [[-.25,0,.05],[.22,.03,.15],[0,.02,-.24],[.05,.3,0]].forEach(([x,y,z])=>add(new THREE.IcosahedronGeometry(.25),x,y,z,z,x)); }
+  else if (el==='Mg'){ add(new THREE.BoxGeometry(.28,2.6,.04),0,1.3,0,.12); g.userData={mat,h:2.6,spread:.2}; }
+  else if (el==='Fe'){ add(new THREE.CylinderGeometry(.09,.09,3,14),0,1.65,0);add(new THREE.ConeGeometry(.09,.3,14),0,.02,0,Math.PI);add(new THREE.CylinderGeometry(.28,.28,.08,20),0,3.15,0);g.rotation.z=.12;g.userData={mat,h:3,spread:.12}; }
+  else if (el==='Cu'||el==='Ag'){ add(new THREE.BoxGeometry(.5,2.4,.05),0,1.2,0,-.1); g.userData={mat,h:2.4,spread:.25}; }
+  else if (el==='Al'){ add(new THREE.BoxGeometry(.7,1.8,.05),0,.9,0,.08); g.userData={mat,h:1.8,spread:.3}; }
+  else { add(new THREE.BoxGeometry(.7,1.2,.14),0,.6,0,.1); g.userData={mat,h:1.2,spread:.3}; } // Pb, Au
+  return g;
+}
+
+// particle pools (bubbles / precipitate)
+function pool(n, geo, mat){const m=new THREE.InstancedMesh(geo,mat,n);m.count=0;m.frustumCulled=false;m.renderOrder=1;tube.add(m);return {m,list:[]}}
+const bubbles = pool(400, new THREE.SphereGeometry(1,10,8), new THREE.MeshStandardMaterial({color:'#ffffff',transparent:true,opacity:.7,roughness:.05,metalness:0}));
+const pptMat = new THREE.MeshStandardMaterial({color:'#3b8fe0',roughness:.9});
+const ppt = pool(360, new THREE.IcosahedronGeometry(1,0), pptMat);
+const dummy = new THREE.Object3D();
+function flush(p){p.list.forEach((b,i)=>{dummy.position.copy(b.p);dummy.scale.setScalar(b.s);dummy.updateMatrix();p.m.setMatrixAt(i,dummy.matrix)});p.m.count=p.list.length;p.m.instanceMatrix.needsUpdate=true}
+
+// flame for K
+const flame = new THREE.Mesh(new THREE.ConeGeometry(.28,1.1,20,1,true), new THREE.MeshBasicMaterial({color:'#b77cff',transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending}));
+flame.visible=false; tube.add(flame);
+const flameLight = new THREE.PointLight('#a970ff', 0, 6); tube.add(flameLight);
+let crystals = new THREE.Group(); tube.add(crystals);
+
+// ------------------------------------------------------------ state
+const S = {metal:'Zn', rg:'hcl', hot:false, guess:null};
+let metalObj=null, E=null, run=null, journal=[];
+
+function setupScene(){
+  if (metalObj) tube.remove(metalObj);
+  metalObj = makeMetal(S.metal);
+  metalObj.position.set(0, TH + .9, 0);
+  tube.add(metalObj);
+  bubbles.list=[]; ppt.list=[]; flush(bubbles); flush(ppt);
+  tube.remove(crystals); crystals = new THREE.Group(); tube.add(crystals);
+  flame.visible=false; flameLight.intensity=0;
+  const R = REAGENTS[S.rg];
+  liqMat.color.set(R.c); liqMat.opacity = R.c==='#2f86f0'?.62:.5;
+  bLiq.material.color.set(R.c); drawLabel(R);
+  E = experiment(S.metal, S.rg, S.hot); run = null;
+  renderStatus();
+}
+function renderStatus(){
+  const R=REAGENTS[S.rg];
+  $('status').innerHTML = `<span class="pill">${S.metal} + ${R.f}</span>` + (S.rg==='water'&&S.hot?'<span class="pill hot">🔥 ыстық су</span>':'') + (run&&E.danger?'<span class="pill warn">⚠ Тек виртуалды тәжірибе</span>':'') + (S.rg==='water'?'<span class="pill">+ фенолфталеин</span>':'');
+}
+
+// ------------------------------------------------------------ UI
+function buildUI(){
+  const n = SERIES.length;
+  $('series').innerHTML = SERIES.map((el,i)=> el==='H'
+    ? `<div class="el hmark">(H)<small>сутек</small></div>`
+    : `<button class="el" data-el="${el}" style="--c:hsl(${12+ i/(n-1)*190} 65% 55%)"><i></i>${el}<small>${NAME[el]}</small></button>`).join('');
+  $('reagents').innerHTML = Object.entries(REAGENTS).map(([k,r])=>`<button class="rg" data-rg="${k}" style="--c:${r.c}"><span class="sw"></span><span><b>${r.f}</b><br><small>${r.n}</small></span></button>`).join('');
+  $('series').onclick = e => {const b=e.target.closest('[data-el]'); if(b) choose(b.dataset.el, S.rg)};
+  $('reagents').onclick = e => {const b=e.target.closest('[data-rg]'); if(b) choose(S.metal, b.dataset.rg)};
+  $('heat').onchange = e => {S.hot=e.target.checked; choose(S.metal,S.rg)};
+  document.querySelectorAll('.guess').forEach(b=>b.onclick=()=>{S.guess=b.dataset.g==='1';syncUI()});
+  $('run').onclick = start;
+  document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const [m,r]=b.dataset.m.split(',');choose(m,r)});
+}
+function choose(metal, rg){
+  S.metal=metal; S.rg=rg; S.guess=null;
+  if (rg!=='water'||metal!=='Mg'){S.hot=false;$('heat').checked=false}
+  $('result').classList.add('hidden');
+  setupScene(); syncUI();
+}
+function syncUI(){
+  document.querySelectorAll('.el[data-el]').forEach(b=>b.classList.toggle('on',b.dataset.el===S.metal));
+  document.querySelectorAll('.rg').forEach(b=>b.classList.toggle('on',b.dataset.rg===S.rg));
+  document.querySelectorAll('.guess').forEach(b=>b.classList.toggle('on',S.guess!==null&&(b.dataset.g==='1')===S.guess));
+  $('heatRow').classList.toggle('hidden', !(S.rg==='water' && S.metal==='Mg'));
+  const R=REAGENTS[S.rg];
+  $('question').innerHTML = `<b>${S.metal}</b> (${NAME[S.metal]}) + <b>${R.f}</b> (${R.n.toLowerCase()}) — реакция жүре ме?`;
+  $('run').disabled = S.guess===null || (run && !run.shown);
+  $('run').textContent = S.guess===null ? 'Алдымен болжам жаса' : '▶ Тәжірибені бастау';
+}
+function start(){
+  if (S.guess===null) return;
+  setupScene(); run = {t:0, shown:false, guess:S.guess, emit:0, pemit:0, from:new THREE.Color(REAGENTS[S.rg].c), to:new THREE.Color(E.liquid), coatFrom:new THREE.Color(COLOR[S.metal])};
+  renderStatus(); syncUI();
+}
+function showResult(){
+  const ok = run.guess === E.reacts;
+  $('result').innerHTML = `<h3>Нәтиже</h3>
+    <div class="verdict ${ok?'ok':'bad'}">${ok?'✓ Болжамың дұрыс!':'✗ Болжам расталмады'} — реакция ${E.reacts?'жүреді':'жүрмейді'}</div>
+    ${E.eqs.length?`<div class="eq">${E.eqs.map(q=>`<div>${q}</div>`).join('')}</div>`:''}
+    <p>${E.obs}</p><p class="why">${E.why}</p>
+    ${E.danger?'<p class="danger">⚠ Бұл тәжірибе өте қауіпті — нақты мектеп зертханасында жасалмайды.</p>':''}`;
+  $('result').classList.remove('hidden');
+  journal.unshift({m:S.metal, r:REAGENTS[S.rg].f + (S.hot&&S.rg==='water'?' (t°)':''), yes:E.reacts, ok});
+  $('journal').innerHTML = `<table><tr><th>Металл</th><th>Ерітінді</th><th>Реакция</th><th>Болжам</th></tr>${journal.slice(0,12).map(j=>`<tr><td><b>${j.m}</b></td><td>${j.r}</td><td>${j.yes?'✓ жүреді':'— жоқ'}</td><td>${j.ok?'✓':'✗'}</td></tr>`).join('')}</table>
+    <div class="score">Дұрыс болжам: <b>${journal.filter(j=>j.ok).length}/${journal.length}</b></div>`;
+  S.guess=null; syncUI();
+}
+
+// ------------------------------------------------------------ animation
+const rnd = (a,b)=>a+Math.random()*(b-a);
+const smooth = x => x*x*(3-2*x);
+function metalRest(){ // where the sample ends up in the tube
+  if (E.kind!=='none' && (S.metal==='K'||S.metal==='Na')) return LEVEL - .05;
+  return .12;
+}
+function step(dt){
+  if (!run) { if(metalObj) metalObj.rotation.y += dt*.4; return; }
+  run.t += dt;
+  const drop = .9, rest = metalRest();
+  if (run.t < drop){ const k=run.t/drop; metalObj.position.y = TH+.9 + (rest-(TH+.9))*k*k; metalObj.rotation.y+=dt; return; }
+  metalObj.position.y = rest;
+  const tr = run.t - drop, p = Math.min(1, tr/9), sp = smooth(p);
+  if (!run.shown && tr > 2.6){ run.shown=true; showResult(); }
+  if (E.kind==='none') return;
+  liqMat.color.copy(run.from).lerp(run.to, sp);
+  const left = 1 - E.shrink*sp;
+  metalObj.scale.setScalar(Math.max(.001,left));
+  // floating alkali: melts into a ball and runs on the surface
+  if ((S.metal==='K'||S.metal==='Na') && E.kind!=='none'){
+    if (!run.ball){ run.ball=true; metalObj.clear(); const b=new THREE.Mesh(new THREE.SphereGeometry(.3,24,16),metalObj.userData.mat); metalObj.add(b); }
+    metalObj.position.x = .42*Math.cos(tr*2.3); metalObj.position.z = .42*Math.sin(tr*3.1);
+    if (S.metal==='K' && left>.05){ flame.visible=true; flame.position.set(metalObj.position.x, LEVEL+.6, metalObj.position.z); flame.scale.set(1,1+.3*Math.sin(tr*30),1); flame.material.opacity=.35+.25*Math.random(); flameLight.position.copy(flame.position); flameLight.intensity=6+4*Math.random(); }
+    else { flame.visible=false; flameLight.intensity=0; }
+  }
+  // coating / crystals for displacement
+  if (E.kind==='disp'){
+    metalObj.userData.mat.color.copy(run.coatFrom).lerp(new THREE.Color(E.coat), Math.min(1,sp*1.4));
+    metalObj.userData.mat.roughness = .28 + .5*sp; metalObj.userData.mat.metalness = E.coatEl==='Ag'?.9:.9-.5*sp;
+    if (E.coatEl==='Ag' && crystals.children.length < 70 && Math.random()<dt*20){
+      const c=new THREE.Mesh(new THREE.OctahedronGeometry(rnd(.06,.14),0),new THREE.MeshStandardMaterial({color:'#f1f1f4',metalness:1,roughness:.2}));
+      const h=metalObj.userData.h; c.position.set(rnd(-.35,.35),rnd(.1,h*.95),rnd(-.12,.12)); c.rotation.set(rnd(0,3),rnd(0,3),0); c.scale.setScalar(.01); crystals.add(c);
+    }
+    crystals.children.forEach(c=>c.scale.setScalar(Math.min(1,c.scale.x+dt*.6)));
+  }
+  // bubbles
+  const gas = E.kind==='water'||E.kind==='acid'||E.kind==='alkali';
+  if (gas){
+    const fade = S.metal==='Pb' ? Math.max(0,1-tr/5) : 1;
+    run.emit += E.rate*Math.max(0,left)*fade*dt;
+    const md = metalObj.userData;
+    while (run.emit>=1 && bubbles.list.length<400){
+      run.emit--;
+      const floating = S.metal==='K'||S.metal==='Na';
+      const pos = floating ? new THREE.Vector3(metalObj.position.x+rnd(-.3,.3), LEVEL-rnd(.05,.3), metalObj.position.z+rnd(-.3,.3))
+        : new THREE.Vector3(rnd(-md.spread,md.spread)*left + metalObj.position.x, rnd(.1, md.h*left+.1), rnd(-.2,.2));
+      bubbles.list.push({p:pos, s:rnd(.03,.08)*(E.rate>60?1.3:1), v:rnd(1.6,3.2)*(floating?.4:1), w:rnd(0,6)});
+    }
+  }
+  for (const b of bubbles.list){ b.p.y += b.v*dt; b.p.x += Math.sin(run.t*6+b.w)*.004; b.s*=1+dt*.15; }
+  bubbles.list = bubbles.list.filter(b=>b.p.y < LEVEL-.02); flush(bubbles);
+  // precipitate / fallen deposit
+  if (E.kind==='alkali' || (E.kind==='disp' && E.coatEl!=='Ag')){
+    pptMat.color.set(E.kind==='alkali'?E.ppt:E.coat);
+    run.pemit += (E.kind==='alkali'?40:8)*(1-p)*dt;
+    while (run.pemit>=1 && ppt.list.length<360){ run.pemit--;
+      const from = E.kind==='alkali' ? new THREE.Vector3(rnd(-.6,.6), LEVEL-rnd(.1,.8), rnd(-.6,.6)) : new THREE.Vector3(rnd(-.3,.3)+metalObj.position.x, rnd(.3,metalObj.userData.h), rnd(-.15,.15));
+      ppt.list.push({p:from, s:rnd(.03,.07), v:rnd(.3,.9)}); }
+  }
+  for (const q of ppt.list){ const r2=q.p.x*q.p.x+q.p.z*q.p.z, floor=LR-Math.sqrt(Math.max(0,LR*LR-r2))+.05; if(q.p.y>floor){q.p.y=Math.max(floor,q.p.y-q.v*dt);q.p.x*=1-dt*.05;} }
+  flush(ppt);
+}
+
+function resize(){ const w=box3d.clientWidth, h=box3d.clientHeight; if(!w||!h)return; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(box3d);
+const clock = new THREE.Clock();
+let labVisible = true;
+renderer.setAnimationLoop(()=>{ const dt=Math.min(.05,clock.getDelta()); if(!labVisible)return; step(dt); controls.update(); renderer.render(scene,camera); });
+
+// ------------------------------------------------------------ AR models
+const AR = {
+  series:{tab:'Қатар',title:'Белсенділік қатары',sub:'K … Au: бағана биіктігі — белсенділік',src:'models/series.glb',
+    pts:['Сол жақта — ең белсенді металдар: K, Na, Ca','(H) — шекара: одан солдағылар қышқылдан H₂ ығыстырады','Оң жақта — «асыл» металдар: Cu, Hg, Ag, Au'],
+    q:'<b>Сұрақ:</b> Zn мен Cu-дың қайсысы тұз қышқылынан сутекті ығыстырады? Неге?',
+    hs:()=>{const o=['K','Na','Ca','Mg','Al','Zn','Fe','Pb','H','Cu','Hg','Ag','Au'],n=o.length;return o.map((e,i)=>{const x=-.025*(n-1)+i*.05,h=.02+.16*(n-1-i)/(n-1);return {p:[x,e==='H'?.215:.012+h+.036,0],t:e==='H'?'(H)':e,c:e==='H'?'h':''}}).concat([{p:[0,.012,.075],t:'белсенділік кемиді →',c:'arrow'}])}},
+  water:{tab:'Су',title:'Металдар және су',sub:'2Na + 2H₂O → 2NaOH + H₂↑',src:'models/water.glb',
+    pts:['Na су бетінде жүгіріп, сутек бөледі','Фенолфталеин таңқурай — сілті түзілді','Mg суық суда өте баяу, Cu — мүлде әрекеттеспейді'],
+    q:'<b>Сұрақ:</b> неге натрийді керосин астында сақтайды?',
+    hs:()=>[{p:[-.05,.075,0],t:'Na + H₂O ✓',c:'ok'},{p:[.06,.165,0],t:'Mg (баяу)',c:''},{p:[.1,.165,0],t:'Cu ✗',c:'no'}]},
+  acid:{tab:'HCl',title:'Металдар және қышқыл',sub:'Zn + 2HCl → ZnCl₂ + H₂↑',src:'models/acid.glb',
+    pts:['Mg — өте қарқынды көпіршиді','Zn — орташа, Fe — баяу','Cu — көпіршік жоқ: сутектен кейін тұр'],
+    q:'<b>Сұрақ:</b> көпіршік жылдамдығы бойынша төрт металды қатарға қой.',
+    hs:()=>[['Mg',-.075],['Zn',-.025],['Fe',.025],['Cu',.075]].map(([e,x])=>({p:[x,.165,0],t:e==='Cu'?'Cu ✗':e,c:e==='Cu'?'no':''}))},
+  salt:{tab:'CuSO₄',title:'Металл тұз ерітіндісінде',sub:'Fe + CuSO₄ → FeSO₄ + Cu',src:'models/salt.glb',
+    pts:['Темір шеге қызыл мыс қабатымен қапталады','Көк ерітінді әлсірейді','Кері реакция жүрмейді: Cu + FeSO₄ ✗'],
+    q:'<b>Сұрақ:</b> мыс сымды FeSO₄ ерітіндісіне салсақ, неге ештеңе өзгермейді?',
+    hs:()=>[{p:[-.055,.125,0],t:'Fe + CuSO₄ ✓',c:'ok'},{p:[.055,.125,0],t:'Cu + FeSO₄ ✗',c:'no'}]}
+};
+const mv = $('mv'), tabs = $('tabs');
+function drawQr(){const el=$('qr');if(!window.qrcode||!el)return;const q=qrcode(0,'M');q.addData(location.href);q.make();el.innerHTML=q.createSvgTag({cellSize:3,margin:0});}
+function show(k){
+  const lab = !(k in AR);
+  labVisible = lab;
+  $('lab3d').classList.toggle('hidden',!lab); $('status').classList.toggle('hidden',!lab);
+  mv.classList.toggle('hidden',lab); $('labAside').classList.toggle('hidden',!lab); $('arAside').classList.toggle('hidden',lab);
+  tabs.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.k===(lab?'lab':k)));
+  history.replaceState(null,'',location.search+'#'+(lab?'lab':k));
+  if (lab){ resize(); return; }
+  const m = AR[k];
+  mv.src = m.src; mv.cameraOrbit = k==='series'?'0deg 72deg auto':'20deg 70deg auto';
+  mv.querySelectorAll('.hs').forEach(h=>h.remove());
+  m.hs().forEach((h,i)=>{const b=document.createElement('div');b.className='hs '+h.c;b.slot='hotspot-'+i;b.dataset.position=h.p.map(v=>v+'m').join(' ');b.textContent=h.t;mv.append(b)});
+  $('arTitle').textContent=m.title; $('arSub').textContent=m.sub;
+  $('arPts').innerHTML=m.pts.map(p=>`<li>${p}</li>`).join(''); $('arQ').innerHTML=m.q; drawQr();
+}
+[['lab','🧪 3D зертхана'],...Object.entries(AR).map(([k,m])=>[k,m.tab])].forEach(([k,t])=>{
+  const b=document.createElement('button');b.className='tab'+(k==='lab'?'':' ar');b.dataset.k=k;b.textContent=t;b.onclick=()=>show(k);tabs.append(b)});
+
+buildUI(); choose('Zn','hcl');
+const h0 = location.hash.slice(1); show(h0 in AR ? h0 : 'lab');
+</script>
+<script>(function(){const n=new URLSearchParams(location.search).get('lesson');if(n&&/^\d+$/.test(n))document.getElementById('mk-back').href='../lesson.html?lesson='+n;})();</script>
+</body>
+</html>

@@ -56,4 +56,5 @@
 | `note` | Қысқа түсініктеме (міндетті емес) |
 
 Қазір бар құралдар: `digital-lab/` — цифрлы зертхана, `vrar-molecules/` — AR молекулалар (`#water`, `#co2`, `#ch4`, `#nacl`), `files/nacl_project.blend` — NaCl торының Blender жобасы.
+`activity-series/` — металдардың белсенділік қатары: 3D зертхана (`#lab`) және AR модельдер (`#series`, `#water`, `#acid`, `#salt`). Модельдер `digital-chemistry-5/tools/build_activity_models.py` арқылы жасалады.
 
