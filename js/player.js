@@ -367,7 +367,6 @@ const TOOL_NAMES = {lab: 'зертхана', ar: 'AR', vr: 'VR', '3d': '3D', fil
 
 function setupTeacherMode(data) {
   document.body.classList.add('teacher-mode');
-  $('#role-badge').textContent = data.user.role === 'admin' ? 'Әкімші кабинеті' : 'Мұғалім кабинеті';
   $('#role-badge').classList.remove('hidden');
   $('#lesson-state').classList.add('hidden');
   $('#teacher-actions').classList.remove('hidden');
