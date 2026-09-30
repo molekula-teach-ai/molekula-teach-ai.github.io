@@ -175,6 +175,7 @@ const LessonMaterials = (() => {
     const count = find('#materials-count');
     count.textContent = `${materials.length} материал`;
     count.classList.remove('hidden');
+    document.dispatchEvent(new CustomEvent('materials:count', {detail: materials.length}));
     if (!materials.length) {
       const empty = document.createElement('div');
       empty.className = 'materials-empty';

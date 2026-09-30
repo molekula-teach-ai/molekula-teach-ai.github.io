@@ -1,5 +1,7 @@
 (() => {
-  if (getToken()) { location.replace('lesson.html'); return; }
+  // Ссылка учителя «lesson.html?lesson=N» сохраняется через вход.
+  const next = /^\?lesson=\d+$/.test(location.search) ? `lesson.html${location.search}` : 'lesson.html';
+  if (getToken()) { location.replace(next); return; }
   const find = selector => document.querySelector(selector);
   const registerForm = find('#register-form');
   const details = find('#registration-details');
@@ -19,7 +21,7 @@
     registerForm.setAttribute('aria-busy', String(value));
   };
   const selectedRole = () => registerForm.querySelector('[name="role"]:checked')?.value;
-  const enter = data => { setToken(data.token); location.href = 'lesson.html'; };
+  const enter = data => { setToken(data.token); location.href = next; };
 
   document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(button => {

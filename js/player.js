@@ -7,6 +7,7 @@ let ytReady = false;
 let activeTest = null;
 let lastSavedTime = -1;
 const $ = (selector) => document.querySelector(selector);
+const isTeacherRole = () => lessonData?.user.role === 'teacher' || lessonData?.user.role === 'admin';
 
 function formatTime(seconds) {
   const value = Math.max(0, Math.floor(Number(seconds) || 0));
@@ -27,7 +28,7 @@ function initPlayer() {
         timer = setInterval(updateTime, 1000);
       },
       onStateChange: (event) => {
-        if (event.data === YT.PlayerState.ENDED && lessonData?.user.role !== 'teacher' && lessonData?.user.role !== 'admin') openTest();
+        if (event.data === YT.PlayerState.ENDED && !isTeacherRole()) openTest();
       }
     }
   });
@@ -42,7 +43,7 @@ function updateTime() {
   const label = formatTime(time);
   $('#time-label').textContent = label;
   $('#context-time').textContent = `Контекст · ${label}`;
-  if (lessonData?.user.role !== 'teacher' && lessonData?.user.role !== 'admin' && time > 0 && time % 10 === 0 && time !== lastSavedTime) {
+  if (!isTeacherRole() && time > 0 && time % 10 === 0 && time !== lastSavedTime) {
     lastSavedTime = time;
     apiFetch('/api/progress', {method:'POST', body:{lesson_id:lessonId, timestamp:time}}).catch(() => {});
   }
@@ -54,7 +55,7 @@ function addMessage(text, type='assistant') {
   node.className = `message ${type}`;
   const label = document.createElement('span');
   label.className = 'message-label';
-  label.textContent = type === 'user' ? 'Сіз' : type === 'error' ? 'Қате' : 'Тәлімгер';
+  label.textContent = type === 'user' ? 'Сіз' : type === 'error' ? 'Қате' : isTeacherRole() ? 'Көмекші' : 'Тәлімгер';
   const body = document.createElement('p');
 
   // Если сообщение от ассистента — парсим Markdown через marked, иначе выводим как простой текст
@@ -93,7 +94,10 @@ async function sendMessage(forcedText) {
 $('#pause-ask')?.addEventListener('click', () => {
   player?.pauseVideo?.();
   const input = $('#user-input');
-  input.value = `Мен ${formatTime(currentSeconds())} уақытындағы үзіндіні түсінбедім. Оны қарапайымдау түсіндір.`;
+  const time = formatTime(currentSeconds());
+  input.value = isTeacherRole()
+    ? `${time} уақытындағы үзінді бойынша оқушыларға 3 талқылау сұрағын құрастыр.`
+    : `Мен ${time} уақытындағы үзіндіні түсінбедім. Оны қарапайымдау түсіндір.`;
   input.focus();
 });
 
@@ -104,14 +108,17 @@ $('#user-input')?.addEventListener('keydown', event => {
 $('#user-input')?.addEventListener('input', event => {
   event.target.style.height = 'auto'; event.target.style.height = `${Math.min(event.target.scrollHeight, 120)}px`;
 });
-document.querySelectorAll('.suggestion').forEach(button => button.addEventListener('click', () => sendMessage(button.dataset.question)));
+$('#chat-box')?.addEventListener('click', event => {
+  const button = event.target.closest('.suggestion');
+  if (button) sendMessage(button.dataset.question);
+});
 $('#clear-chat')?.addEventListener('click', () => {
   $('#chat-box').replaceChildren();
   addMessage('Чат тазаланды. Мен сабақтың ағымдағы тайм-кодын әлі де көріп тұрмын.');
 });
 
 async function openTest() {
-  if (!lessonData || lessonData.user.role === 'teacher' || lessonData.user.role === 'admin') return;
+  if (!lessonData || isTeacherRole()) return;
   const modal = $('#test-modal');
   modal.classList.remove('hidden');
   $('#test-content').innerHTML = '<div class="loading-state">ЖИ сабақ материалдары бойынша 5 сұрақ дайындап жатыр…</div>';
@@ -246,7 +253,7 @@ function renderLesson(data) {
     }).catch(() => {});
   }
   $('#course-name').textContent = data.course;
-  $('#sidebar-title').textContent = isTeacher ? 'Барлық сабақтар' : 'Сіздің үлгеріміңіз';
+  $('#sidebar-title').textContent = isTeacher ? 'Сабақ жоспары' : 'Сіздің үлгеріміңіз';
   $('.progress-track').classList.toggle('hidden', isTeacher);
   $('#student-completion').classList.toggle('hidden', isTeacher);
   $('#progress-bar').style.width = `${lessons.length ? Math.round(user.completed / lessons.length * 100) : 0}%`;
@@ -261,6 +268,7 @@ function renderLesson(data) {
   lessons.forEach(item => {
     const locked = !isTeacher && item.id > user.unlocked_lesson;
     const link = document.createElement('a');
+    link.dataset.id = item.id;
     link.className = 'lesson-item' + (item.id === lessonId ? ' active' : '') + (locked ? ' locked' : '');
     if (locked) link.setAttribute('aria-disabled', 'true');
     else link.href = `lesson.html?lesson=${item.id}`;
@@ -281,17 +289,26 @@ function renderLesson(data) {
 // Бэкенд это поле не использует, поэтому оно читается напрямую с GitHub Pages.
 const TOOL_ICONS = {lab: '⚗', ar: '◈', vr: '◈', '3d': '⬡', file: '⤓', link: '↗'};
 
+let catalogPromise = null;
+function loadCatalog() {
+  catalogPromise ??= fetch('lessons.json', {cache: 'no-cache'})
+    .then(res => res.json())
+    .then(catalog => (Array.isArray(catalog) ? catalog : catalog.lessons) || [])
+    .catch(() => []);
+  return catalogPromise;
+}
+
+const lessonTools = lesson => (lesson?.tools || []).filter(t => t && t.title && t.url);
+
 async function renderTools(id) {
   const box = $('#lesson-tools');
   if (!box) return;
-  let tools = [];
-  try {
-    const res = await fetch('lessons.json', {cache: 'no-cache'});
-    const catalog = await res.json();
-    const lessons = Array.isArray(catalog) ? catalog : catalog.lessons;
-    tools = (lessons?.[id - 1]?.tools || []).filter(t => t && t.title && t.url);
-  } catch { tools = []; }
+  const tools = lessonTools((await loadCatalog())[id - 1]);
   box.classList.toggle('hidden', !tools.length);
+  if (isTeacherRole()) {
+    $('#nav-tools').textContent = tools.length ? `${tools.length} құрал · QR-кодпен` : 'Бұл сабақта жоқ';
+    $('#nav-tools-link').classList.toggle('disabled', !tools.length);
+  }
   const list = $('#tool-list');
   list.replaceChildren();
   tools.forEach(tool => {
@@ -338,17 +355,117 @@ async function renderToolQr(list, tool, id) {
   box.className = 'tool-qr';
   box.innerHTML = qr.createSvgTag({cellSize: 3, margin: 0});
   const text = document.createElement('span');
-  const title = document.createElement('b'); title.textContent = 'Телефонмен сканерле';
-  const note = document.createElement('small'); note.textContent = 'AR ашылады: камераға рұқсат бер де, модельді партаға қой';
+  const title = document.createElement('b'); title.textContent = isTeacherRole() ? 'Оқушыларға экраннан көрсетіңіз' : 'Телефонмен сканерле';
+  const note = document.createElement('small'); note.textContent = isTeacherRole() ? 'Оқушылар телефонмен сканерлейді — AR модель бірден ашылады' : 'AR ашылады: камераға рұқсат бер де, модельді партаға қой';
   text.append(title, note);
   box.append(text);
   list.append(box);
 }
 
+// Режим учителя: другой порядок блоков, панель быстрых действий, подготовка к уроку вместо прохождения.
+const TOOL_NAMES = {lab: 'зертхана', ar: 'AR', vr: 'VR', '3d': '3D', file: 'файл', link: 'сілтеме'};
+
+function setupTeacherMode(data) {
+  document.body.classList.add('teacher-mode');
+  $('#role-badge').textContent = data.user.role === 'admin' ? 'Әкімші кабинеті' : 'Мұғалім кабинеті';
+  $('#role-badge').classList.remove('hidden');
+  $('#lesson-state').classList.add('hidden');
+  $('#teacher-actions').classList.remove('hidden');
+  $('#teacher-nav').classList.remove('hidden');
+  $('#nav-duration').textContent = data.lesson.duration ? `${data.lesson.duration} мин · проекторға` : 'Проекторға шығару';
+  $('#sidebar-tip').textContent = 'Сабақты таңдаңыз: бейне, ҚМЖ, слайдтар және құралдар бір бетте. Барлық сабақтар ашық.';
+
+  // Материалы (ҚМЖ, слайды) — главное для учителя, поэтому сразу после видео.
+  const area = $('.lesson-area');
+  area.insertBefore($('#lesson-materials'), $('#lesson-tools'));
+  $('#materials-title').textContent = 'Сабаққа дайындық материалдары';
+
+  $('#tools-eyebrow').textContent = 'Сыныпта қолдану';
+  $('#tools-title').textContent = 'Интерактив құралдар';
+  $('#pause-ask').innerHTML = '<span aria-hidden="true">?</span> Осы үзінді бойынша сұрақтар';
+
+  $('#assistant-name').textContent = 'Мұғалімнің ЖИ-көмекшісі';
+  const suggestions = [
+    ['Сабақ жоспары', 'Осы сабаққа 45 минуттық қысқаша сабақ жоспарын құр: мақсат, кезеңдер, уақыт.'],
+    ['Талқылау сұрақтары', 'Сабақ бойынша оқушылармен талқылауға 5 сұрақ құрастыр, жауаптарымен.'],
+    ['Үй тапсырмасы', 'Осы сабақ бойынша үй тапсырмасын ұсын: 3 деңгейлі (жеңіл, орташа, күрделі).'],
+    ['Жиі қателер', 'Оқушылар осы тақырыпта қандай қателер жібереді және оларды қалай түзетуге болады?']
+  ];
+  const box = $('#chat-box');
+  box.replaceChildren();
+  addMessage('Мен сабаққа дайындалуға көмектесемін: жоспар, сұрақтар, үй тапсырмасы. Бейненің кез келген сәтін тоқтатып, сол үзінді туралы сұраңыз.');
+  suggestions.forEach(([label, question]) => {
+    const button = document.createElement('button');
+    button.className = 'suggestion';
+    button.dataset.question = question;
+    button.textContent = `${label} `;
+    const arrow = document.createElement('span'); arrow.textContent = '→';
+    button.append(arrow);
+    box.append(button);
+  });
+  $('#user-input').placeholder = 'Мысалы: осы тақырыпқа сергіту сәтін ойлап тап…';
+
+  document.addEventListener('materials:count', event => {
+    const count = event.detail;
+    $('#nav-materials').textContent = count ? `${count} материал` : 'Әзірге жоқ';
+  });
+
+  loadCatalog().then(lessons => {
+    document.querySelectorAll('#lesson-list .lesson-item').forEach(link => {
+      const item = lessons[Number(link.dataset.id) - 1];
+      if (!item) return;
+      const parts = [];
+      if (item.duration) parts.push(`${item.duration} мин`);
+      lessonTools(item).forEach(tool => parts.push(TOOL_NAMES[tool.type] || TOOL_NAMES.link));
+      link.querySelector('small').textContent = [`Сабақ ${link.dataset.id}`, ...new Set(parts)].join(' · ');
+    });
+  });
+}
+
+// «Сыныпта көрсету»: видео на весь экран для проектора.
+$('#present-lesson')?.addEventListener('click', () => {
+  const frame = $('.video-frame');
+  const request = frame.requestFullscreen || frame.webkitRequestFullscreen;
+  if (request) request.call(frame).catch?.(() => {});
+  player?.playVideo?.();
+});
+
+function lessonShareUrl() {
+  const url = new URL('lesson.html', location.href);
+  url.search = `?lesson=${lessonId}`;
+  return url.href;
+}
+
+$('#share-lesson')?.addEventListener('click', async () => {
+  const modal = $('#share-modal');
+  const url = lessonShareUrl();
+  $('#share-url').value = url;
+  $('#share-status').textContent = '';
+  modal.classList.remove('hidden');
+  $('#copy-share').focus();
+  try {
+    await loadQrLib();
+    const qr = qrcode(0, 'M'); qr.addData(url); qr.make();
+    $('#share-qr').innerHTML = qr.createSvgTag({cellSize: 6, margin: 0});
+  } catch { $('#share-qr').classList.add('hidden'); }
+});
+$('#copy-share')?.addEventListener('click', async () => {
+  const input = $('#share-url');
+  try { await navigator.clipboard.writeText(input.value); }
+  catch { input.select(); document.execCommand?.('copy'); }
+  $('#share-status').textContent = 'Сілтеме көшірілді — чатқа немесе Classroom-ға қойыңыз.';
+});
+const closeShare = () => $('#share-modal').classList.add('hidden');
+$('#close-share')?.addEventListener('click', closeShare);
+$('#share-modal')?.addEventListener('click', event => { if (event.target.id === 'share-modal') closeShare(); });
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !$('#share-modal').classList.contains('hidden')) closeShare();
+});
+
 $('#logout')?.addEventListener('click', () => { clearToken(); location.replace('index.html'); });
 
 (async function boot() {
-  if (!getToken()) { location.replace('index.html'); return; }
+  if (!getToken()) { location.replace(`index.html${location.search}`); return; }
   const requested = new URLSearchParams(location.search).get('lesson') || 1;
   try {
     lessonData = await apiFetch(`/api/lesson?lesson=${encodeURIComponent(requested)}`);
@@ -357,6 +474,7 @@ $('#logout')?.addEventListener('click', () => { clearToken(); location.replace('
     return;
   }
   renderLesson(lessonData);
+  if (isTeacherRole()) setupTeacherMode(lessonData);
   renderTools(lessonId);
   LessonMaterials.load(lessonData.user, lessonId);
   initPlayer();

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Molekula</title>
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/style.css?v=3">
   <style>
     .tools-card{margin-top:18px;padding:22px 28px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}
     .tools-card h2{margin:0;font-size:20px}
@@ -27,6 +27,7 @@
     </div>
     <div class="course-title"><span>Курс</span><b id="course-name">Жүйелі ойлау</b></div>
     <div class="profile-menu">
+      <span class="role-badge hidden" id="role-badge">Мұғалім кабинеті</span>
       <div class="avatar" id="avatar"></div>
       <div class="profile-copy"><b id="user-name"></b><span id="user-handle"></span></div>
       <button id="logout" class="icon-button" title="Шығу" aria-label="Шығу">↗</button>
@@ -38,17 +39,28 @@
       <div class="sidebar-heading"><span class="eyebrow">Бағдарлама</span><b id="sidebar-title">Сіздің үлгеріміңіз</b></div>
       <div class="progress-track"><span id="progress-bar" style="width: 0%"></span></div>
       <nav class="lesson-list" id="lesson-list" aria-label="Сабақтар"></nav>
-      <div class="sidebar-note"><span>✦</span><p><b>Кеңес</b>Бейнені тоқтатып, белгілі бір үзінді туралы ЖИ-ден сұраңыз.</p></div>
+      <div class="sidebar-note"><span>✦</span><p><b>Кеңес</b><span id="sidebar-tip">Бейнені тоқтатып, белгілі бір үзінді туралы ЖИ-ден сұраңыз.</span></p></div>
     </aside>
 
     <section class="lesson-area">
       <div class="lesson-head">
         <div><span class="eyebrow" id="lesson-eyebrow"></span><h1 id="lesson-title"></h1></div>
         <div class="lesson-state" id="lesson-state"></div>
+        <div class="teacher-actions hidden" id="teacher-actions">
+          <button id="share-lesson" class="button secondary" type="button">Оқушыларға беру <span aria-hidden="true">⌗</span></button>
+          <button id="present-lesson" class="button primary" type="button"><span aria-hidden="true">⛶</span> Сыныпта көрсету</button>
+        </div>
       </div>
 
+      <nav class="teacher-nav hidden" id="teacher-nav" aria-label="Сабақ бөлімдері">
+        <a href="#lesson-video"><b>1</b><span>Бейнесабақ<small id="nav-duration">Сыныпта көрсету</small></span></a>
+        <a href="#lesson-materials"><b>2</b><span>ҚМЖ мен слайдтар<small id="nav-materials">Жүктелуде…</small></span></a>
+        <a href="#lesson-tools" id="nav-tools-link"><b>3</b><span>Интерактив құралдар<small id="nav-tools">Жоқ</small></span></a>
+        <a href="#assistant"><b>4</b><span>ЖИ-көмекші<small>Сұрақтар, жоспар, үй жұмысы</small></span></a>
+      </nav>
+
       <div class="learning-grid">
-        <section class="video-card">
+        <section class="video-card" id="lesson-video">
           <div class="video-frame"><div id="player"></div><div id="video-loader" class="video-loader"><span></span><p>Сабақ жүктеліп жатыр</p></div></div>
           <div class="video-meta">
             <div><b id="time-label">00:00</b><span>Ағымдағы үзінді</span></div>
@@ -56,9 +68,9 @@
           </div>
         </section>
 
-        <section class="assistant-card">
+        <section class="assistant-card" id="assistant">
           <header class="assistant-head">
-            <div class="ai-avatar">✦</div><div><b>ЖИ-тәлімгер</b><span><i></i> Сабақ контексі қосылды</span></div>
+            <div class="ai-avatar">✦</div><div><b id="assistant-name">ЖИ-тәлімгер</b><span><i></i> Сабақ контексі қосылды</span></div>
             <button id="clear-chat" class="icon-button" title="Чатты тазарту">↺</button>
           </header>
           <div id="chat-box" class="chat-box" aria-live="polite">
@@ -74,8 +86,8 @@
       </div>
 
       <section class="tools-card hidden" id="lesson-tools">
-        <span class="eyebrow">Сабақ құралдары</span>
-        <h2>Сабақпен бірге жұмыс істеңіз</h2>
+        <span class="eyebrow" id="tools-eyebrow">Сабақ құралдары</span>
+        <h2 id="tools-title">Сабақпен бірге жұмыс істеңіз</h2>
         <div class="tool-list" id="tool-list"></div>
       </section>
 
@@ -112,6 +124,22 @@
     <div class="modal-card">
       <header class="modal-head"><div><span class="eyebrow">Білімді тексеру</span><h2 id="test-title">Сабақ бойынша тест</h2></div><button id="close-test" class="icon-button" aria-label="Жабу">×</button></header>
       <div id="test-content" class="test-content"></div>
+    </div>
+  </div>
+
+  <div id="share-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="share-title">
+    <div class="modal-card share-card">
+      <header class="modal-head"><div><span class="eyebrow">Оқушыларға беру</span><h2 id="share-title">Сабаққа сілтеме</h2></div><button id="close-share" class="icon-button" aria-label="Жабу">×</button></header>
+      <div class="share-body">
+        <div id="share-qr" class="share-qr" aria-hidden="true"></div>
+        <div class="share-copy">
+          <p>Оқушылар QR-кодты телефонмен сканерлейді немесе сілтемені ашады. Кіргеннен кейін сабақ бірден ашылады.</p>
+          <input id="share-url" readonly aria-label="Сабақ сілтемесі">
+          <button id="copy-share" class="button primary wide" type="button">Сілтемені көшіру</button>
+          <p id="share-status" class="share-status" role="status" aria-live="polite"></p>
+          <small>Ескерту: оқушыға сабақ алдыңғы сабақтардың тестін тапсырғаннан кейін ғана ашылады.</small>
+        </div>
+      </div>
     </div>
   </div>
 

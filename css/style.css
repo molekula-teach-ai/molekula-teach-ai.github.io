@@ -1175,6 +1175,135 @@ button:disabled:hover {
     min-height: 0;
     margin: 0;
 }
+/* ---------- Режим учителя ---------- */
+.role-badge {
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: var(--orange-soft);
+    color: #9b4e16;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.teacher-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.teacher-nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.teacher-nav a {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+}
+.teacher-nav a:hover {
+    border-color: var(--blue);
+    background: var(--blue-soft);
+}
+.teacher-nav a.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+.teacher-nav b {
+    display: grid;
+    flex: 0 0 30px;
+    height: 30px;
+    place-items: center;
+    border-radius: 8px;
+    background: var(--blue-soft);
+    color: var(--blue);
+    font-size: 13px;
+}
+.teacher-nav span {
+    display: grid;
+    min-width: 0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+.teacher-nav small {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 400;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.teacher-mode #lesson-video,
+.teacher-mode #assistant,
+.teacher-mode #lesson-materials,
+.teacher-mode #lesson-tools {
+    scroll-margin-top: 90px;
+}
+.teacher-mode .lesson-item small {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 11px;
+}
+.video-frame:fullscreen {
+    aspect-ratio: auto;
+}
+.share-card {
+    width: min(620px, 100%);
+}
+.share-body {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    padding: 24px;
+}
+.share-qr {
+    flex: none;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    line-height: 0;
+}
+.share-qr svg {
+    width: 180px;
+    height: 180px;
+}
+.share-copy {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+}
+.share-copy p {
+    margin: 0;
+    color: #625f5a;
+    font-size: 14px;
+}
+.share-copy input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--canvas);
+    color: var(--ink);
+    font-size: 13px;
+}
+.share-copy small {
+    color: var(--muted);
+    font-size: 12px;
+}
+.share-status {
+    min-height: 1em;
+    color: var(--green) !important;
+    font-weight: 700;
+}
 @media (max-width: 1100px) {
     .workspace {
         grid-template-columns: 220px minmax(0, 1fr);
@@ -1187,6 +1316,9 @@ button:disabled:hover {
     }
     .sidebar {
         padding-inline: 12px;
+    }
+    .teacher-nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 @media (max-width: 760px) {
@@ -1260,6 +1392,37 @@ button:disabled:hover {
     }
     .lesson-state {
         display: none;
+    }
+    .lesson-head:has(.teacher-actions:not(.hidden)) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+    .teacher-actions {
+        flex-direction: column-reverse;
+    }
+    .teacher-nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .teacher-nav a {
+        padding: 10px;
+        gap: 8px;
+    }
+    .teacher-nav b {
+        flex-basis: 26px;
+        height: 26px;
+    }
+    .role-badge {
+        display: none;
+    }
+    .share-body {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 20px 16px;
+    }
+    .share-qr {
+        align-self: center;
     }
     .learning-grid {
         gap: 14px;
