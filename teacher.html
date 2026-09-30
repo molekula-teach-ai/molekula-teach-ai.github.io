@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мұғалім кабинеті — Molekula</title>
+  <link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body class="app-page teacher-mode">
+  <header class="topbar">
+    <div class="topbar-left">
+      <a class="brand" href="teacher.html"><span class="brand-mark">M</span><span>Molekula</span></a>
+    </div>
+    <div class="course-title"><span>Курс</span><b id="course-name"></b></div>
+    <div class="profile-menu">
+      <span class="role-badge">Мұғалім кабинеті</span>
+      <div class="avatar" id="avatar"></div>
+      <div class="profile-copy"><b id="user-name"></b><span id="user-handle"></span></div>
+      <button id="logout" class="icon-button" title="Шығу" aria-label="Шығу">↗</button>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <section class="dashboard-hero">
+      <div>
+        <span class="eyebrow">Мұғалім кабинеті</span>
+        <h1 id="greeting">Сәлеметсіз бе!</h1>
+        <p>Сабақты таңдаңыз: бейнені сыныпта көрсетіңіз, ҚМЖ мен слайдтарды жүктеп алыңыз, сыныптық тест құрастырыңыз.</p>
+      </div>
+      <div class="dashboard-stats" aria-label="Курс туралы">
+        <div><b id="stat-lessons">—</b><span>сабақ</span></div>
+        <div><b id="stat-materials">—</b><span>материал</span></div>
+        <div><b id="stat-tools">—</b><span>интерактив құрал</span></div>
+      </div>
+    </section>
+
+    <div id="dashboard-status" class="materials-status" role="status" aria-live="polite"></div>
+
+    <section aria-labelledby="lessons-heading">
+      <div class="dashboard-heading">
+        <h2 id="lessons-heading">Курс сабақтары</h2>
+        <label class="dashboard-filter"><input type="checkbox" id="filter-ready"> Тек ҚМЖ бар сабақтар</label>
+      </div>
+      <div class="lesson-cards" id="lesson-cards"></div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/teacher.js"></script>
+</body>
+</html>

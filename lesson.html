@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Molekula</title>
-  <link rel="stylesheet" href="css/style.css?v=3">
+  <link rel="stylesheet" href="css/style.css?v=4">
   <style>
     .tools-card{margin-top:18px;padding:22px 28px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}
     .tools-card h2{margin:0;font-size:20px}
@@ -36,6 +36,7 @@
 
   <main class="workspace" id="workspace">
     <aside class="sidebar" id="sidebar">
+      <a id="dashboard-link" class="dashboard-link hidden" href="teacher.html">← Барлық сабақтар</a>
       <div class="sidebar-heading"><span class="eyebrow">Бағдарлама</span><b id="sidebar-title">Сіздің үлгеріміңіз</b></div>
       <div class="progress-track"><span id="progress-bar" style="width: 0%"></span></div>
       <nav class="lesson-list" id="lesson-list" aria-label="Сабақтар"></nav>
@@ -47,6 +48,7 @@
         <div><span class="eyebrow" id="lesson-eyebrow"></span><h1 id="lesson-title"></h1></div>
         <div class="lesson-state" id="lesson-state"></div>
         <div class="teacher-actions hidden" id="teacher-actions">
+          <button id="class-test" class="button secondary" type="button">Сыныптық тест <span aria-hidden="true">✓</span></button>
           <button id="share-lesson" class="button secondary" type="button">Оқушыларға беру <span aria-hidden="true">⌗</span></button>
           <button id="present-lesson" class="button primary" type="button"><span aria-hidden="true">⛶</span> Сыныпта көрсету</button>
         </div>
@@ -124,6 +126,22 @@
     <div class="modal-card">
       <header class="modal-head"><div><span class="eyebrow">Білімді тексеру</span><h2 id="test-title">Сабақ бойынша тест</h2></div><button id="close-test" class="icon-button" aria-label="Жабу">×</button></header>
       <div id="test-content" class="test-content"></div>
+    </div>
+  </div>
+
+  <div id="class-test-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="class-test-title">
+    <div class="modal-card class-test-card">
+      <header class="modal-head">
+        <div><span class="eyebrow">Сыныпта тексеру</span><h2 id="class-test-title">Сыныптық тест</h2></div>
+        <div class="class-test-tools">
+          <button id="toggle-answers" class="button secondary" type="button" disabled>Жауаптарды көрсету</button>
+          <button id="print-test" class="button secondary" type="button" disabled>Басып шығару</button>
+          <button id="regenerate-test" class="button secondary" type="button" disabled>Жаңа нұсқа</button>
+          <button id="close-class-test" class="icon-button" aria-label="Жабу">×</button>
+        </div>
+      </header>
+      <div id="class-test-body" class="class-test-body"></div>
+      <div id="class-test-answers" class="class-test-answers hidden"></div>
     </div>
   </div>
 

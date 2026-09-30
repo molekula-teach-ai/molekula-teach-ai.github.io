@@ -371,6 +371,8 @@ function setupTeacherMode(data) {
   $('#lesson-state').classList.add('hidden');
   $('#teacher-actions').classList.remove('hidden');
   $('#teacher-nav').classList.remove('hidden');
+  $('.brand').href = 'teacher.html';
+  $('#dashboard-link').classList.remove('hidden');
   $('#nav-duration').textContent = data.lesson.duration ? `${data.lesson.duration} мин · проекторға` : 'Проекторға шығару';
   $('#sidebar-tip').textContent = 'Сабақты таңдаңыз: бейне, ҚМЖ, слайдтар және құралдар бір бетте. Барлық сабақтар ашық.';
 
@@ -429,6 +431,49 @@ $('#present-lesson')?.addEventListener('click', () => {
   player?.playVideo?.();
 });
 
+// Сыныптық тест: ЖИ вопросы по уроку для проектора или печати; ответы скрыты до нажатия.
+const CLASS_TEST_PROMPT = 'Осы сабақ бойынша сыныпта тексеруге 5 тест сұрағын құрастыр. Әр сұрақта 4 жауап нұсқасы болсын (A, B, C, D). ' +
+  'Сұрақтарды нөмірлеп жаз. Ең соңында бөлек жолға тек «ЖАУАПТАР:» деп жазып, одан кейін әр сұрақтың дұрыс жауабын қысқа түсіндірмесімен бер.';
+let classTestBusy = false;
+
+async function openClassTest() {
+  $('#class-test-modal').classList.remove('hidden');
+  if (classTestBusy || $('#class-test-body').childElementCount) return;
+  classTestBusy = true;
+  ['#toggle-answers', '#print-test', '#regenerate-test'].forEach(id => { $(id).disabled = true; });
+  $('#class-test-answers').classList.add('hidden');
+  $('#toggle-answers').textContent = 'Жауаптарды көрсету';
+  $('#class-test-body').innerHTML = '<div class="loading-state">ЖИ сабақ бойынша 5 сұрақ дайындап жатыр…</div>';
+  try {
+    const data = await apiFetch('/api/ask_ai', {method: 'POST', body: {question: CLASS_TEST_PROMPT, timestamp: 0, lesson_id: lessonId}});
+    const [questions, ...rest] = String(data.answer).split(/\**\s*ЖАУАПТАР\s*:?\s*\**/i);
+    $('#class-test-body').innerHTML = renderMarkdown(questions);
+    $('#class-test-answers').innerHTML = rest.length ? `<h3>Жауаптар</h3>${renderMarkdown(rest.join(''))}` : '';
+    $('#toggle-answers').disabled = !rest.length;
+    $('#print-test').disabled = false;
+  } catch (error) {
+    $('#class-test-body').textContent = error.message;
+  } finally {
+    $('#regenerate-test').disabled = false;
+    classTestBusy = false;
+  }
+}
+
+$('#class-test')?.addEventListener('click', openClassTest);
+$('#regenerate-test')?.addEventListener('click', () => { $('#class-test-body').replaceChildren(); openClassTest(); });
+$('#toggle-answers')?.addEventListener('click', () => {
+  const hidden = $('#class-test-answers').classList.toggle('hidden');
+  $('#toggle-answers').textContent = hidden ? 'Жауаптарды көрсету' : 'Жауаптарды жасыру';
+});
+$('#print-test')?.addEventListener('click', () => {
+  document.body.classList.add('printing-test');
+  window.print();
+  document.body.classList.remove('printing-test');
+});
+const closeClassTest = () => $('#class-test-modal').classList.add('hidden');
+$('#close-class-test')?.addEventListener('click', closeClassTest);
+$('#class-test-modal')?.addEventListener('click', event => { if (event.target.id === 'class-test-modal') closeClassTest(); });
+
 function lessonShareUrl() {
   const url = new URL('lesson.html', location.href);
   url.search = `?lesson=${lessonId}`;
@@ -458,7 +503,9 @@ const closeShare = () => $('#share-modal').classList.add('hidden');
 $('#close-share')?.addEventListener('click', closeShare);
 $('#share-modal')?.addEventListener('click', event => { if (event.target.id === 'share-modal') closeShare(); });
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && !$('#share-modal').classList.contains('hidden')) closeShare();
+  if (event.key !== 'Escape') return;
+  if (!$('#share-modal').classList.contains('hidden')) closeShare();
+  if (!$('#class-test-modal').classList.contains('hidden')) closeClassTest();
 });
 
 $('#logout')?.addEventListener('click', () => { clearToken(); location.replace('index.html'); });
@@ -473,7 +520,11 @@ $('#logout')?.addEventListener('click', () => { clearToken(); location.replace('
     return;
   }
   renderLesson(lessonData);
-  if (isTeacherRole()) setupTeacherMode(lessonData);
+  if (isTeacherRole()) {
+    if (!new URLSearchParams(location.search).has('lesson')) { location.replace('teacher.html'); return; }
+    setupTeacherMode(lessonData);
+    if (location.hash === '#class-test') openClassTest();
+  }
   renderTools(lessonId);
   LessonMaterials.load(lessonData.user, lessonId);
   initPlayer();
