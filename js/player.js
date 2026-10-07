@@ -243,7 +243,7 @@ function renderLesson(data) {
   document.title = `${lesson.title} — Molekula`;
   $('#user-name').textContent = name;
   const roleLabel = user.role === 'admin' ? 'Әкімші' : isTeacher ? 'Мұғалім' : 'Оқушы';
-  $('#user-handle').textContent = `${roleLabel} · @${user.username}`;
+  $('#user-handle').textContent = roleLabel === name ? '' : roleLabel;
   $('#avatar').textContent = name[0].toUpperCase();
   if (user.has_photo) {
     apiFetch('/api/profile-photo', {blob: true}).then(blob => {

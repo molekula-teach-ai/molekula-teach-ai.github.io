@@ -15,7 +15,7 @@
   function renderUser(user, course) {
     const name = user.display_name || user.username;
     $('#user-name').textContent = name;
-    $('#user-handle').textContent = `Мұғалім · @${user.username}`;
+    $('#user-handle').textContent = name === 'Мұғалім' ? '' : 'Мұғалім';
     $('#avatar').textContent = name[0].toUpperCase();
     $('#course-name').textContent = course;
     $('#greeting').textContent = `Сәлеметсіз бе, ${name}!`;

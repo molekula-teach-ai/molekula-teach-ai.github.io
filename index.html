@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Кіру — Molekula</title>
-  <link rel="stylesheet" href="css/style.css?v=4">
+  <title>Molekula</title>
+  <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body class="auth-page">
   <main class="auth-shell">
@@ -21,62 +21,24 @@
     <section class="auth-panel">
       <div class="auth-card">
         <div class="mobile-brand"><span class="brand-mark">M</span><b>Molekula</b></div>
-        <span class="eyebrow">Жеке кабинет</span>
-        <h2>Қош келдіңіз</h2>
-        <p class="muted">Кіріңіз немесе Telegram арқылы есептік жазбаны растаңыз.</p>
+        <span class="eyebrow">Қош келдіңіз</span>
+        <h2>Сіз кімсіз?</h2>
+        <p class="muted">Molekula-ны қалай қолданатыныңызды таңдаңыз — тіркелу қажет емес.</p>
 
-        <div class="tabs" aria-label="Есептік жазба">
-          <button class="tab active" type="button" data-tab="login" aria-pressed="true" aria-controls="login-form">Кіру</button>
-          <button class="tab" type="button" data-tab="register" aria-pressed="false" aria-controls="register-form">Тіркелу</button>
+        <div class="auth-form role-options" role="group" aria-label="Рөлді таңдау">
+          <button class="role-option" type="button" data-role="student">
+            <span><b>Оқушы</b><small>Бейнесабақтарды көріп, ЖИ-мен үйреніңіз және білімді тексеріңіз.</small></span>
+          </button>
+          <button class="role-option" type="button" data-role="teacher">
+            <span><b>Мұғалім</b><small>Барлық сабақтар, ҚМЖ, слайдтар және сабақ өткізуге арналған материалдар.</small></span>
+          </button>
         </div>
-
-        <form id="login-form" class="auth-form">
-          <label>Telegram username<input name="username" autocomplete="username" placeholder="@username" required></label>
-          <label>Құпия сөз<input name="password" type="password" autocomplete="current-password" placeholder="Кемінде 8 таңба" required></label>
-          <button class="button primary wide" type="submit">Кіру <span>→</span></button>
-        </form>
-
-        <form id="register-form" class="auth-form hidden">
-          <div id="role-step" class="auth-form">
-            <fieldset class="role-options">
-              <legend>Сіз мұғалімсіз бе, әлде оқушысыз ба?</legend>
-              <p class="role-intro">Molekula-ны қалай қолданатыныңызды таңдаңыз.</p>
-              <label class="role-option">
-                <input type="radio" name="role" value="student" required>
-                <span><b>Оқушы</b><small>Бейнесабақтарды көріп, ЖИ-мен үйреніңіз және білімді тексеріңіз.</small></span>
-              </label>
-              <label class="role-option">
-                <input type="radio" name="role" value="teacher" required>
-                <span><b>Мұғалім</b><small>Барлық сабақтар, ҚМЖ, слайдтар және сабақ өткізуге арналған материалдар.</small></span>
-              </label>
-            </fieldset>
-            <button id="continue-registration" class="button primary wide" type="button">Жалғастыру <span aria-hidden="true">→</span></button>
-          </div>
-          <fieldset id="registration-details" class="auth-form hidden" disabled>
-            <legend class="visually-hidden">Telegram арқылы растау</legend>
-            <div class="selected-role"><span>Таңдауыңыз: <b id="selected-role-label"></b></span><button id="change-role" class="text-button" type="button">Өзгерту</button></div>
-            <div class="telegram-step">
-              <span class="step-index">2</span>
-              <div><b>Telegram-ботты ашыңыз</b><p>Start батырмасын басыңыз — бот қай username енгізу керегін жазады. Telegram-да username орнатылған болуы керек.</p></div>
-            </div>
-            <a class="button telegram wide" id="telegram-link" href="#" target="_blank" rel="noreferrer">Telegram-ботты ашу</a>
-            <label>Telegram username<input name="username" autocomplete="username" placeholder="@username" required></label>
-            <button id="request-code" class="button secondary wide" type="button">Telegram арқылы код алу</button>
-            <fieldset id="verify-fields" class="auth-form hidden" disabled>
-              <legend class="visually-hidden">Есептік жазба деректері</legend>
-              <label>Растау коды<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="000000" required></label>
-              <label>Құпия сөз ойлап табыңыз<input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Кемінде 8 таңба" required></label>
-              <button class="button primary wide" type="submit">Тіркелгі жасау <span aria-hidden="true">→</span></button>
-            </fieldset>
-          </fieldset>
-        </form>
         <div id="auth-status" class="status" role="status" aria-live="polite"></div>
-        <p class="fineprint">Жалғастыра отырып, сіз платформа ережелері мен құпиялылық саясатына келісесіз.</p>
       </div>
     </section>
   </main>
   <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/api.js?v=5"></script>
+  <script src="js/auth.js?v=5"></script>
 </body>
 </html>

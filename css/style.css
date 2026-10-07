@@ -304,6 +304,22 @@ button:disabled:hover {
     cursor: pointer;
     transition: border-color 0.18s ease, background 0.18s ease;
 }
+button.role-option {
+    width: 100%;
+    margin: 0;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+}
+button.role-option:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+}
+button.role-option:disabled {
+    cursor: progress;
+    opacity: 0.6;
+}
 .role-option:hover {
     border-color: var(--blue);
 }
