@@ -22,6 +22,19 @@
         <button class="button primary wide" type="submit">Кіру</button>
       </form>
       <div id="auth-status" class="status" role="status" aria-live="polite"></div>
+      <section id="admin-tools" class="hidden">
+        <p><a class="button primary wide" href="teacher.html">Сабақтар мен материалдарды ашу</a></p>
+        <h2>Сабақ субтитрлері</h2>
+        <p class="muted">ЖИ-көмекші мен тесттер үшін сабақтың нақты мәтінін WebVTT пішімінде қосыңыз.</p>
+        <form id="transcript-form" class="auth-form">
+          <label for="transcript-lesson">Сабақ</label>
+          <select id="transcript-lesson" required></select>
+          <label for="transcript-file">Субтитр файлы (.vtt)</label>
+          <input id="transcript-file" type="file" accept=".vtt,text/vtt" required>
+          <button class="button secondary wide" type="submit">Субтитрлерді сақтау</button>
+        </form>
+        <div id="transcript-status" class="status" role="status" aria-live="polite"></div>
+      </section>
       <a href="index.html">Басты бетке қайту</a>
     </div></section>
   </main>
