@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Әкімші — Molekula</title>
+  <link rel="stylesheet" href="css/style.css?v=5">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-story" aria-label="Материалдарды басқару">
+      <a class="brand brand-light" href="index.html"><span class="brand-mark">M</span><span>Molekula</span></a>
+      <div class="story-copy"><span class="eyebrow light">Әкімші кабинеті</span><h1>Сабақтарды<br>толықтырыңыз.</h1><p>ҚМЖ, слайдтар және мұғалімдерге арналған материалдарды басқарыңыз.</p></div>
+    </section>
+    <section class="auth-panel"><div class="auth-card">
+      <span class="eyebrow">Сайт иесіне арналған</span><h2>Әкімші ретінде кіру</h2>
+      <p class="muted">Жеке әкімші кілтін енгізіңіз. Кілтті басқа адамдарға бермеңіз.</p>
+      <form id="admin-form" class="auth-form">
+        <label for="admin-key">Әкімші кілті</label>
+        <input id="admin-key" name="key" type="password" autocomplete="off" required minlength="32" spellcheck="false" autocapitalize="none">
+        <button class="button primary wide" type="submit">Кіру</button>
+      </form>
+      <div id="auth-status" class="status" role="status" aria-live="polite"></div>
+      <a href="index.html">Басты бетке қайту</a>
+    </div></section>
+  </main>
+  <script src="js/config.js?v=6"></script>
+  <script src="js/api.js?v=5"></script>
+  <script src="js/admin-auth.js"></script>
+</body>
+</html>
